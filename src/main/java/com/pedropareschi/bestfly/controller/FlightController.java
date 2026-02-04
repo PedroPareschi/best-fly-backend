@@ -32,7 +32,7 @@ public class FlightController {
     }
 
     @GetMapping("/locations")
-    public Location[] locations(@RequestParam(required=true) String keyword) throws ResponseException {
+    public Location[] locations(@RequestParam String keyword) throws ResponseException {
         return flightService.searchLocations(keyword);
     }
 }
