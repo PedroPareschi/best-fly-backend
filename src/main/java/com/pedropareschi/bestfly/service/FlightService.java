@@ -1,17 +1,15 @@
 package com.pedropareschi.bestfly.service;
 
 import com.amadeus.exceptions.ResponseException;
+import com.pedropareschi.bestfly.dto.FlightInfoResponse;
 import com.pedropareschi.bestfly.dto.FlightSearchResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -19,15 +17,16 @@ public class FlightService {
 
     private AmadeusService amadeusService;
 
-    public Page<FlightSearchResponse> searchFlights(String originLocation, String destinationLocation, String departureDate, int numberOfAdults, String returnDate, Pageable pageable) throws ResponseException {
-        List<FlightSearchResponse> flights = new ArrayList<>();
+    public FlightSearchResponse searchFlights(String originLocation, String destinationLocation, String departureDate, int numberOfAdults, String returnDate, int max) throws ResponseException {
+        FlightSearchResponse flights = new FlightSearchResponse();
 
-        flights.addAll(FlightMapper.fromAmadeus(amadeusService.searchAmadeus(originLocation, destinationLocation, departureDate, numberOfAdults, returnDate)));
+        Map<String, List<FlightInfoResponse>> amadeusMap = FlightMapper.fromAmadeus(amadeusService.searchAmadeus(originLocation, destinationLocation, departureDate, numberOfAdults, returnDate, max));
+        flights.setDepartures(amadeusMap.get("departures"));
+        flights.setReturns(amadeusMap.get("returns"));
 
-        flights.sort(Comparator.comparingDouble(FlightSearchResponse::price));
+        flights.getDepartures().sort(Comparator.comparingDouble(FlightInfoResponse::price));
+        flights.getReturns().sort(Comparator.comparingDouble(FlightInfoResponse::price));
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), flights.size());
-        return new PageImpl<>(flights.subList(start, end), pageable, flights.size());
+        return flights;
     }
 }

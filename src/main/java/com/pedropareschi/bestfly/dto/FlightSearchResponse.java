@@ -1,13 +1,11 @@
 package com.pedropareschi.bestfly.dto;
 
-public record FlightSearchResponse(
-        String airlineName,
-        int stops,
-        String flightDuration,
-        double price,
-        String departureAirport,
-        String arrivalAirport,
-        String departureTime,
-        String arrivalTime
-) {
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class FlightSearchResponse {
+    private List<FlightInfoResponse> departures;
+    private List<FlightInfoResponse> returns;
 }
