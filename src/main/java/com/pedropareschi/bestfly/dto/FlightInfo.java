@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.dto;
 
-public record FlightInfoResponse(
+public record FlightInfo(
         String airlineCode,
         int stops,
         String flightDuration,

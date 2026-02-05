@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class FlightSearchResponse {
-    private List<FlightInfoResponse> departures;
-    private List<FlightInfoResponse> returns;
+    private List<FlightInfo> departures;
+    private List<FlightInfo> returns;
 }

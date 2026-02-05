@@ -1,19 +1,19 @@
 package com.pedropareschi.bestfly.mapper;
 
 import com.amadeus.resources.FlightOfferSearch;
-import com.pedropareschi.bestfly.dto.FlightInfoResponse;
+import com.pedropareschi.bestfly.dto.FlightInfo;
 
 import java.util.*;
 
 public class FlightMapper {
 
-    public static Map<String, List<FlightInfoResponse>> fromAmadeus(FlightOfferSearch[] flightOffers) {
+    public static Map<String, List<FlightInfo>> fromAmadeus(FlightOfferSearch[] flightOffers) {
         if (flightOffers == null) {
             return Collections.emptyMap();
         }
 
-        List<FlightInfoResponse> departures = new ArrayList<>();
-        List<FlightInfoResponse> returns = new ArrayList<>();
+        List<FlightInfo> departures = new ArrayList<>();
+        List<FlightInfo> returns = new ArrayList<>();
 
         for (FlightOfferSearch offer : flightOffers) {
             String airlineCode = offer.getValidatingAirlineCodes() != null &&
@@ -77,7 +77,7 @@ public class FlightMapper {
                 int returnStops = offer.getItineraries()[1].getSegments() != null ?
                         offer.getItineraries()[1].getSegments().length - 1 : 0;
 
-                returns.add(new FlightInfoResponse(
+                returns.add(new FlightInfo(
                         airlineCode,
                         returnStops,
                         returnDuration,
@@ -89,7 +89,7 @@ public class FlightMapper {
                 ));
             }
 
-            departures.add(new FlightInfoResponse(
+            departures.add(new FlightInfo(
                     airlineCode,
                     stops,
                     flightDuration,
@@ -101,7 +101,7 @@ public class FlightMapper {
             ));
         }
 
-        Map<String, List<FlightInfoResponse>> flights = new HashMap<>();
+        Map<String, List<FlightInfo>> flights = new HashMap<>();
         flights.put("departures", departures);
         flights.put("returns", returns);
         return flights;

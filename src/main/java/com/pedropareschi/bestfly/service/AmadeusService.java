@@ -3,6 +3,7 @@ package com.pedropareschi.bestfly.service;
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.exceptions.ResponseException;
+import com.amadeus.resources.Airline;
 import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.Location;
 import com.pedropareschi.bestfly.dto.enums.LocationSubType;
@@ -21,7 +22,7 @@ public class AmadeusService {
                 .and("subType", subType.getLocation()));
     }
 
-    public FlightOfferSearch[] searchAmadeus(String origin, String destination, String departDate, int numberOfAdults, String returnDate, int max) throws ResponseException {
+    public FlightOfferSearch[] searchFlights(String origin, String destination, String departDate, int numberOfAdults, String returnDate, int max) throws ResponseException {
         Params params = Params.with("originLocationCode", origin)
                 .and("destinationLocationCode", destination)
                 .and("departureDate", departDate)
@@ -34,4 +35,9 @@ public class AmadeusService {
 
         return amadeus.shopping.flightOffersSearch.get(params);
     }
+
+    public Airline[] airlineCodeLookup(String airlineCode) throws ResponseException {
+        return amadeus.referenceData.airlines.get(Params.with("airlineCodes", airlineCode));
+    }
+
 }
