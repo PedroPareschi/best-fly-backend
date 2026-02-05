@@ -1,11 +1,12 @@
 package com.pedropareschi.bestfly.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public record LocationResponse(
         String code,
         String name,
-        String country,
-        List<LocationResponse> subLocations
+        String subType,
+        @JsonInclude(JsonInclude.Include.NON_NULL) String city,
+        String country
 ) {
 }

@@ -2,6 +2,7 @@ package com.pedropareschi.bestfly.controller;
 
 import com.amadeus.exceptions.ResponseException;
 import com.pedropareschi.bestfly.dto.LocationResponse;
+import com.pedropareschi.bestfly.dto.enums.LocationSubType;
 import com.pedropareschi.bestfly.service.LocationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping("/locations")
-    public ResponseEntity<List<LocationResponse>> searchLocations(@RequestParam String keyword) throws ResponseException {
-        return ResponseEntity.ok(locationService.searchLocations(keyword));
+    public ResponseEntity<List<LocationResponse>> searchLocations(@RequestParam String keyword, @RequestParam LocationSubType subType) throws ResponseException {
+        return ResponseEntity.ok(locationService.searchLocations(keyword, subType));
     }
 }

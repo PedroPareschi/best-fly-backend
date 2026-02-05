@@ -2,6 +2,7 @@ package com.pedropareschi.bestfly.service;
 
 import com.amadeus.exceptions.ResponseException;
 import com.pedropareschi.bestfly.dto.LocationResponse;
+import com.pedropareschi.bestfly.dto.enums.LocationSubType;
 import com.pedropareschi.bestfly.mapper.LocationMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,9 @@ public class LocationService {
 
     private AmadeusService amadeusService;
 
-    public List<LocationResponse> searchLocations(String keyword) throws ResponseException {
+    public List<LocationResponse> searchLocations(String keyword, LocationSubType subType) throws ResponseException {
         List<LocationResponse> response = new ArrayList<>();
-        response.addAll(LocationMapper.fromAmadeus(amadeusService.searchLocations(keyword)));
+        response.addAll(LocationMapper.fromAmadeus(amadeusService.searchLocations(keyword, subType)));
         return response;
     }
 }

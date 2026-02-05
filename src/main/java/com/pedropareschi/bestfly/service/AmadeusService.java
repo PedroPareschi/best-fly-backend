@@ -6,6 +6,7 @@ import com.amadeus.exceptions.ResponseException;
 import com.amadeus.referenceData.Locations;
 import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.Location;
+import com.pedropareschi.bestfly.dto.enums.LocationSubType;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,10 @@ public class AmadeusService {
 
     private final Amadeus amadeus;
 
-    public Location[] searchLocations(String keyword) throws ResponseException {
+    public Location[] searchLocations(String keyword, LocationSubType subType) throws ResponseException {
         return amadeus.referenceData.locations.get(Params
                 .with("keyword", keyword)
-                .and("subType", Locations.ANY));
+                .and("subType", subType.getLocation()));
     }
 
     public FlightOfferSearch[] searchAmadeus(String origin, String destination, String departDate, int numberOfAdults, String returnDate) throws ResponseException {
