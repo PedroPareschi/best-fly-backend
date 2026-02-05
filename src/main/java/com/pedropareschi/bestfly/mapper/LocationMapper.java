@@ -17,17 +17,20 @@ public class LocationMapper {
 
         groupedByCity.forEach((cityCode, locationList) -> {
             String cityName = locationList.get(0).getAddress().getCityName();
+            String country = locationList.get(0).getAddress().getCountryName();
 
             List<LocationResponse> subLocations = locationList.stream()
                     .map(location -> new LocationResponse(
                             location.getIataCode(),
                             location.getName(),
+                            location.getAddress().getCountryName(),
                             null))
                     .toList();
 
             locationResponses.add(new LocationResponse(
                     cityCode,
                     cityName,
+                    country,
                     subLocations
             ));
         });

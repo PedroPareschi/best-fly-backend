@@ -18,7 +18,7 @@ public class AmadeusService {
     public Location[] searchLocations(String keyword) throws ResponseException {
         return amadeus.referenceData.locations.get(Params
                 .with("keyword", keyword)
-                .and("subType", Locations.AIRPORT));
+                .and("subType", Locations.ANY));
     }
 
     public FlightOfferSearch[] searchAmadeus(String origin, String destination, String departDate, int numberOfAdults, String returnDate) throws ResponseException {
