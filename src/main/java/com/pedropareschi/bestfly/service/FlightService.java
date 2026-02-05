@@ -1,8 +1,8 @@
 package com.pedropareschi.bestfly.service;
 
 import com.amadeus.exceptions.ResponseException;
-import com.amadeus.resources.Location;
 import com.pedropareschi.bestfly.dto.FlightSearchResponse;
+import com.pedropareschi.bestfly.mapper.FlightMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,14 +19,10 @@ public class FlightService {
 
     private AmadeusService amadeusService;
 
-    public Location[] searchLocations(String keyword) throws ResponseException {
-        return amadeusService.searchLocations(keyword);
-    }
-
     public Page<FlightSearchResponse> searchFlights(String originLocation, String destinationLocation, String departureDate, int numberOfAdults, String returnDate, Pageable pageable) throws ResponseException {
         List<FlightSearchResponse> flights = new ArrayList<>();
 
-        flights.addAll(amadeusService.searchAmadeus(originLocation, destinationLocation, departureDate, numberOfAdults, returnDate));
+        flights.addAll(FlightMapper.fromAmadeus(amadeusService.searchAmadeus(originLocation, destinationLocation, departureDate, numberOfAdults, returnDate)));
 
         flights.sort(Comparator.comparingDouble(FlightSearchResponse::price));
 
