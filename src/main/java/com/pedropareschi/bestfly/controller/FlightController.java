@@ -9,13 +9,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/flights")
+@RestController
+@RequestMapping("/flights")
 @AllArgsConstructor
 public class FlightController {
 
     private FlightService flightService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<FlightSearchResponse> searchFlights(
             @RequestParam String originLocation,
             @RequestParam String destinationLocation,
@@ -28,7 +29,7 @@ public class FlightController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity<FlightConfirmationResponse> confirmFlight(@RequestBody FlightConfirmationRequest request) {
+    public ResponseEntity<FlightConfirmationResponse> confirmFlight(@RequestBody FlightConfirmationRequest request) throws ResponseException {
         FlightConfirmationResponse response = flightService.confirmFlight(request.departureFlight(), request.returnFlight());
         return ResponseEntity.ok(response);
     }

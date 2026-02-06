@@ -33,7 +33,7 @@ public class FlightService {
         return flights;
     }
 
-    public FlightConfirmationResponse confirmFlight(FlightInfo departureFlight, FlightInfo returnFlight) {
+    public FlightConfirmationResponse confirmFlight(FlightInfo departureFlight, FlightInfo returnFlight) throws ResponseException {
         AirlineInfo departureFlightAirline = airlineService.getAirlineInfo(departureFlight.airlineCode());
         AirlineInfo returnFlightAirline = null;
         if (returnFlight != null) {

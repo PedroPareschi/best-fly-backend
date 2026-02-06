@@ -1,5 +1,6 @@
 package com.pedropareschi.bestfly.service;
 
+import com.amadeus.exceptions.ResponseException;
 import com.pedropareschi.bestfly.dto.AirlineInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AirlineService {
 
-    private AirlabsService airlabsService;
+    private ApiNinjasService apiNinjasService;
 
-    public AirlineInfo getAirlineInfo(String airlineCode)  {
-        return airlabsService.getAirlineByIata(airlineCode);
+    public AirlineInfo getAirlineInfo(String airlineCode) throws ResponseException {
+        return apiNinjasService.getAirlineByIata(airlineCode);
     }
 }

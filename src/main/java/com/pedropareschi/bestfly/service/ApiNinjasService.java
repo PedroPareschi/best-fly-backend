@@ -1,43 +1,45 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.AirlabsAirlineResponse;
 import com.pedropareschi.bestfly.dto.AirlineInfo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
 @Service
-public class AirlabsService {
+public class ApiNinjasService {
 
     private final RestClient restClient;
     private final String apiKey;
 
-    public AirlabsService(
+    public ApiNinjasService(
             RestClient restClient,
-            @Value("${airlabs.apiKey}") String apiKey
+            @Value("${apininjas.apiKey}") String apiKey
     ) {
         this.restClient = restClient;
         this.apiKey = apiKey;
     }
 
     public AirlineInfo getAirlineByIata(String iataCode) {
-
-        AirlabsAirlineResponse response =
+        List<AirlineInfo> responseList =
                 restClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .scheme("https")
-                                .host("airlabs.co")
-                                .path("/api/v9/airlines")
-                                .queryParam("iata_code", iataCode)
-                                .queryParam("api_key", apiKey)
+                                .host("api.api-ninjas.com")
+                                .path("/v1/airlines")
+                                .queryParam("iata", iataCode)
                                 .build())
+                        .header("x-api-key", apiKey)
                         .retrieve()
-                        .body(AirlabsAirlineResponse.class);
+                        .body(new ParameterizedTypeReference<>() {
+                              }
+                        );
 
-        if (response == null || response.response().isEmpty()) {
+        if (responseList == null || responseList.isEmpty()) {
             return null;
         }
-
-        return response.response().getFirst();
+        return responseList.getFirst();
     }
 }
