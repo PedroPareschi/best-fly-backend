@@ -1,109 +1,128 @@
 package com.pedropareschi.bestfly.mapper;
 
 import com.amadeus.resources.FlightOfferSearch;
-import com.pedropareschi.bestfly.dto.FlightInfo;
+import com.pedropareschi.bestfly.dto.FlightDTO;
 
 import java.util.*;
 
 public class FlightMapper {
 
-    public static Map<String, List<FlightInfo>> fromAmadeus(FlightOfferSearch[] flightOffers) {
+    public static List<FlightDTO> toFlightSearchResponse(FlightOfferSearch[] flightOffers) {
         if (flightOffers == null) {
-            return Collections.emptyMap();
+            return null;
         }
 
-        List<FlightInfo> departures = new ArrayList<>();
-        List<FlightInfo> returns = new ArrayList<>();
+        List<FlightDTO> flights = new ArrayList<>();
 
         for (FlightOfferSearch offer : flightOffers) {
-            String airlineCode = offer.getValidatingAirlineCodes() != null &&
-                    offer.getValidatingAirlineCodes().length > 0 ?
-                    offer.getValidatingAirlineCodes()[0] : "Unknown";
 
-            double price = offer.getPrice() != null ?
-                    offer.getPrice().getTotal() : 0.0;
+            String airlineCode = (offer.getValidatingAirlineCodes() != null &&
+                    offer.getValidatingAirlineCodes().length > 0)
+                    ? offer.getValidatingAirlineCodes()[0]
+                    : "Unknown";
 
-            String departureAirport = "Unknown";
-            String arrivalAirport = "Unknown";
-            String departureTime = "Unknown";
-            String arrivalTime = "Unknown";
-            String flightDuration = "00h 00m";
-            int stops = 0;
+            FlightDTO.FlightPriceDTO priceDTO =
+                    new FlightDTO.FlightPriceDTO(
+                            offer.getPrice().getGrandTotal(),
+                            offer.getPrice().getCurrency()
+                    );
 
-            if (offer.getItineraries() != null && offer.getItineraries().length > 0) {
-                departureAirport = offer.getItineraries()[0].getSegments() != null &&
-                        offer.getItineraries()[0].getSegments().length > 0 ?
-                        offer.getItineraries()[0].getSegments()[0].getDeparture().getIataCode() : "Unknown";
+            FlightDTO.FlightPricingDTO pricingDTO = extractPricing(offer);
 
-                arrivalAirport = offer.getItineraries()[0].getSegments() != null &&
-                        offer.getItineraries()[0].getSegments().length > 0 ?
-                        offer.getItineraries()[0].getSegments()[offer.getItineraries()[0].getSegments().length - 1].getArrival().getIataCode() : "Unknown";
+            List<FlightDTO.ItineraryDTO> itineraries = mapItineraries(offer);
 
-                departureTime = offer.getItineraries()[0].getSegments() != null &&
-                        offer.getItineraries()[0].getSegments().length > 0 ?
-                        offer.getItineraries()[0].getSegments()[0].getDeparture().getAt() : "Unknown";
-
-                arrivalTime = offer.getItineraries()[0].getSegments() != null &&
-                        offer.getItineraries()[0].getSegments().length > 0 ?
-                        offer.getItineraries()[0].getSegments()[offer.getItineraries()[0].getSegments().length - 1].getArrival().getAt() : "Unknown";
-
-                flightDuration = offer.getItineraries()[0].getDuration() != null ?
-                        offer.getItineraries()[0].getDuration() : "00h 00m";
-
-                stops = offer.getItineraries()[0].getSegments() != null ?
-                        offer.getItineraries()[0].getSegments().length - 1 : 0;
-            }
-
-            if (offer.getItineraries() != null && offer.getItineraries().length > 1) {
-                String returnDepartureAirport = offer.getItineraries()[1].getSegments() != null &&
-                        offer.getItineraries()[1].getSegments().length > 0 ?
-                        offer.getItineraries()[1].getSegments()[0].getDeparture().getIataCode() : "Unknown";
-
-                String returnArrivalAirport = offer.getItineraries()[1].getSegments() != null &&
-                        offer.getItineraries()[1].getSegments().length > 0 ?
-                        offer.getItineraries()[1].getSegments()[offer.getItineraries()[1].getSegments().length - 1].getArrival().getIataCode() : "Unknown";
-
-                String returnDepartureTime = offer.getItineraries()[1].getSegments() != null &&
-                        offer.getItineraries()[1].getSegments().length > 0 ?
-                        offer.getItineraries()[1].getSegments()[0].getDeparture().getAt() : "Unknown";
-
-                String returnArrivalTime = offer.getItineraries()[1].getSegments() != null &&
-                        offer.getItineraries()[1].getSegments().length > 0 ?
-                        offer.getItineraries()[1].getSegments()[offer.getItineraries()[1].getSegments().length - 1].getArrival().getAt() : "Unknown";
-
-                String returnDuration = offer.getItineraries()[1].getDuration() != null ?
-                        offer.getItineraries()[1].getDuration() : "00h 00m";
-
-                int returnStops = offer.getItineraries()[1].getSegments() != null ?
-                        offer.getItineraries()[1].getSegments().length - 1 : 0;
-
-                returns.add(new FlightInfo(
-                        airlineCode,
-                        returnStops,
-                        returnDuration,
-                        price,
-                        returnDepartureAirport,
-                        returnArrivalAirport,
-                        returnDepartureTime,
-                        returnArrivalTime
-                ));
-            }
-
-            departures.add(new FlightInfo(
+            FlightDTO dto = new FlightDTO(
                     airlineCode,
-                    stops,
-                    flightDuration,
-                    price,
-                    departureAirport,
-                    arrivalAirport,
-                    departureTime,
-                    arrivalTime
+                    offer.getNumberOfBookableSeats(),
+                    priceDTO,
+                    pricingDTO,
+                    itineraries
+            );
+
+            flights.add(dto);
+        }
+
+        return flights;
+    }
+
+    private static List<FlightDTO.ItineraryDTO> mapItineraries(FlightOfferSearch offer) {
+        List<FlightDTO.ItineraryDTO> itineraries = new ArrayList<>();
+
+        if (offer.getItineraries() == null) return itineraries;
+
+        for (FlightOfferSearch.Itinerary itinerary : offer.getItineraries()) {
+
+            List<FlightDTO.SegmentDTO> segments = new ArrayList<>();
+
+            if (itinerary.getSegments() != null) {
+                for (FlightOfferSearch.SearchSegment segment : itinerary.getSegments()) {
+
+                    FlightDTO.AirportDTO departure =
+                            new FlightDTO.AirportDTO(
+                                    segment.getDeparture().getIataCode(),
+                                    segment.getDeparture().getAt(),
+                                    segment.getDeparture().getTerminal()
+                            );
+
+                    FlightDTO.AirportDTO arrival =
+                            new FlightDTO.AirportDTO(
+                                    segment.getArrival().getIataCode(),
+                                    segment.getArrival().getAt(),
+                                    segment.getArrival().getTerminal()
+                            );
+
+                    FlightDTO.SegmentDTO segmentDTO =
+                            new FlightDTO.SegmentDTO(
+                                    segment.getCarrierCode() + segment.getNumber(),
+                                    segment.getAircraft() != null ? segment.getAircraft().getCode() : "Unknown",
+                                    0, // stops dentro do segmento normalmente é 0
+                                    departure,
+                                    arrival
+                            );
+
+                    segments.add(segmentDTO);
+                }
+            }
+
+            itineraries.add(new FlightDTO.ItineraryDTO(
+                    itinerary.getDuration(),
+                    segments
             ));
         }
 
-        Map<String, List<FlightInfo>> flights = new HashMap<>();
-        flights.put("departures", departures);
-        flights.put("returns", returns);
-        return flights;
+        return itineraries;
+    }
+
+    private static FlightDTO.FlightPricingDTO extractPricing(FlightOfferSearch offer) {
+
+        boolean refundableFare = false;
+        boolean noRestrictionFare = false;
+        boolean noPenaltyFare = false;
+        boolean includedCheckedBagsOnly = false;
+
+        if (offer.getTravelerPricings() != null &&
+                offer.getTravelerPricings().length > 0 &&
+                offer.getTravelerPricings()[0].getFareDetailsBySegment() != null &&
+                offer.getTravelerPricings()[0].getFareDetailsBySegment().length > 0) {
+
+            FlightOfferSearch.PricingOptions pricingOptions = offer.getPricingOptions();
+
+            refundableFare = pricingOptions.isRefundableFare();
+            noRestrictionFare = pricingOptions.isNoRestrictionFare();
+            noPenaltyFare = pricingOptions.isNoPenaltyFare();
+
+            FlightOfferSearch.FareDetailsBySegment fare = offer.getTravelerPricings()[0].getFareDetailsBySegment()[0];
+
+            if (pricingOptions.isIncludedCheckedBagsOnly()) {
+                includedCheckedBagsOnly = fare.getIncludedCheckedBags().getWeight() > 0;
+            }
+        }
+
+        return new FlightDTO.FlightPricingDTO(
+                includedCheckedBagsOnly,
+                refundableFare,
+                noRestrictionFare,
+                noPenaltyFare
+        );
     }
 }

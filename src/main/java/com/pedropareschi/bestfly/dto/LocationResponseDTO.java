@@ -2,7 +2,7 @@ package com.pedropareschi.bestfly.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public record LocationResponse(
+public record LocationResponseDTO(
         String code,
         String name,
         String subType,

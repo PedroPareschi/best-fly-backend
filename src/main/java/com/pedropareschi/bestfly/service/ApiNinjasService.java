@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.AirlineInfo;
+import com.pedropareschi.bestfly.dto.AirlineDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class ApiNinjasService {
         this.apiKey = apiKey;
     }
 
-    public AirlineInfo getAirlineByIata(String iataCode) {
-        List<AirlineInfo> responseList =
+    public AirlineDTO getAirlineByIata(String iataCode) {
+        List<AirlineDTO> responseList =
                 restClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .scheme("https")
