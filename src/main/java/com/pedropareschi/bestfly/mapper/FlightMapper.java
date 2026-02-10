@@ -1,13 +1,14 @@
 package com.pedropareschi.bestfly.mapper;
 
 import com.amadeus.resources.FlightOfferSearch;
+import com.pedropareschi.bestfly.dto.AirlineDTO;
 import com.pedropareschi.bestfly.dto.FlightDTO;
 
 import java.util.*;
 
 public class FlightMapper {
 
-    public static List<FlightDTO> toFlightSearchResponse(FlightOfferSearch[] flightOffers) {
+    public static List<FlightDTO> toFlightSearchResponse(FlightOfferSearch[] flightOffers, Map<String, AirlineDTO> airlines) {
         if (flightOffers == null) {
             return null;
         }
@@ -31,10 +32,12 @@ public class FlightMapper {
 
             List<FlightDTO.ItineraryDTO> itineraries = mapItineraries(offer);
 
+            AirlineDTO airline = airlines.get(airlineCode);
+
             FlightDTO dto = new FlightDTO(
-                    airlineCode,
                     offer.getNumberOfBookableSeats(),
                     priceDTO,
+                    airline,
                     pricingDTO,
                     itineraries
             );

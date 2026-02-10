@@ -3,9 +3,9 @@ package com.pedropareschi.bestfly.dto;
 import java.util.List;
 
 public record FlightDTO(
-        String airlineCode,
         int numberOfBookableSeats,
         FlightPriceDTO price,
+        AirlineDTO airline,
         FlightPricingDTO pricing,
         List<ItineraryDTO> itineraries
 ) {
