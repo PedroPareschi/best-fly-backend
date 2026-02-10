@@ -13,31 +13,38 @@ public record FlightDTO(
     public record ItineraryDTO(
             String duration,
             List<SegmentDTO> segments
-    ) {}
+    ) {
+        public int getStops() {
+            return segments.size() - 1;
+        }
+    }
 
     public record SegmentDTO(
             String flightNumber,
             String aircraftCode,
-            int stops,
             AirportDTO departure,
             AirportDTO arrival
-    ) {}
+    ) {
+    }
 
     public record AirportDTO(
             String airportCode,
             String time,
             String terminal
-    ) {}
+    ) {
+    }
 
     public record FlightPriceDTO(
             double total,
             String currency
-    ) {}
+    ) {
+    }
 
     public record FlightPricingDTO(
             boolean includedCheckedBagsOnly,
             boolean refundableFare,
             boolean noRestrictionFare,
             boolean noPenaltyFare
-    ) {}
+    ) {
+    }
 }

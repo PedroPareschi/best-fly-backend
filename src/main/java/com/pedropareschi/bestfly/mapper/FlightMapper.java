@@ -75,7 +75,6 @@ public class FlightMapper {
                             new FlightDTO.SegmentDTO(
                                     segment.getCarrierCode() + segment.getNumber(),
                                     segment.getAircraft() != null ? segment.getAircraft().getCode() : "Unknown",
-                                    0, // stops dentro do segmento normalmente é 0
                                     departure,
                                     arrival
                             );
