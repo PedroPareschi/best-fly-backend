@@ -67,20 +67,7 @@ public class FlightMapper {
                                     segment.getDeparture().getTerminal()
                             );
 
-                    FlightDTO.AirportDTO arrival =
-                            new FlightDTO.AirportDTO(
-                                    segment.getArrival().getIataCode(),
-                                    segment.getArrival().getAt(),
-                                    segment.getArrival().getTerminal()
-                            );
-
-                    FlightDTO.SegmentDTO segmentDTO =
-                            new FlightDTO.SegmentDTO(
-                                    segment.getCarrierCode() + segment.getNumber(),
-                                    segment.getAircraft() != null ? segment.getAircraft().getCode() : "Unknown",
-                                    departure,
-                                    arrival
-                            );
+                    FlightDTO.SegmentDTO segmentDTO = getSegmentDTO(segment, departure);
 
                     segments.add(segmentDTO);
                 }
@@ -93,6 +80,22 @@ public class FlightMapper {
         }
 
         return itineraries;
+    }
+
+    private static FlightDTO.SegmentDTO getSegmentDTO(FlightOfferSearch.SearchSegment segment, FlightDTO.AirportDTO departure) {
+        FlightDTO.AirportDTO arrival =
+                new FlightDTO.AirportDTO(
+                        segment.getArrival().getIataCode(),
+                        segment.getArrival().getAt(),
+                        segment.getArrival().getTerminal()
+                );
+
+        return new FlightDTO.SegmentDTO(
+                segment.getCarrierCode() + segment.getNumber(),
+                segment.getAircraft() != null ? segment.getAircraft().getCode() : "Unknown",
+                departure,
+                arrival
+        );
     }
 
     private static FlightDTO.FlightPricingDTO extractPricing(FlightOfferSearch offer) {
