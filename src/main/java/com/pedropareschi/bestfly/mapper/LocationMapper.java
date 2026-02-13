@@ -1,17 +1,17 @@
 package com.pedropareschi.bestfly.mapper;
 
 import com.amadeus.referenceData.Locations;
-import com.pedropareschi.bestfly.dto.LocationResponseDTO;
+import com.pedropareschi.bestfly.dto.LocationDTO;
 import com.amadeus.resources.Location;
 
 import java.util.*;
 
 public class LocationMapper {
 
-    public static List<LocationResponseDTO> fromAmadeus(Location[] locations) {
+    public static List<LocationDTO> fromAmadeus(Location[] locations) {
         return Arrays.stream(locations)
                 .filter(location -> location.getAddress() != null)
-                .map(location -> new LocationResponseDTO(
+                .map(location -> new LocationDTO(
                         location.getIataCode(),
                         location.getName(),
                         location.getSubType(),

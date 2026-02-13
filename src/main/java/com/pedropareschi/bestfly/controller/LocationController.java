@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.controller;
 
 import com.amadeus.exceptions.ResponseException;
-import com.pedropareschi.bestfly.dto.LocationResponseDTO;
+import com.pedropareschi.bestfly.dto.LocationDTO;
 import com.pedropareschi.bestfly.dto.enums.LocationSubType;
 import com.pedropareschi.bestfly.service.LocationService;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping
-    public ResponseEntity<List<LocationResponseDTO>> searchLocations(@RequestParam String keyword, @RequestParam LocationSubType subType) throws ResponseException {
+    public ResponseEntity<List<LocationDTO>> searchLocations(@RequestParam String keyword, @RequestParam LocationSubType subType) throws ResponseException {
         return ResponseEntity.ok(locationService.searchLocations(keyword, subType));
     }
 }
