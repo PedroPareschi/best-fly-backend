@@ -7,8 +7,11 @@ import com.pedropareschi.bestfly.entity.SearchHistory;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.SearchHistoryRepository;
 import com.pedropareschi.bestfly.repository.UserRepository;
+import com.pedropareschi.bestfly.security.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,22 +24,22 @@ public class SearchHistoryService {
     private SearchHistoryRepository searchHistoryRepository;
     private UserRepository userRepository;
 
-    public List<SearchHistoryDTO> listSearchHistory(Long userId) {
-        List<SearchHistory> history = userId == null
-                ? searchHistoryRepository.findAll()
-                : searchHistoryRepository.findByUserId(userId);
+    public List<SearchHistoryDTO> listSearchHistory() {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        List<SearchHistory> history = searchHistoryRepository.findByUserId(currentUserId);
         return history.stream().map(SearchHistoryService::toDTO).toList();
     }
 
     public Optional<SearchHistoryDTO> getSearchHistory(Long id) {
-        return searchHistoryRepository.findById(id).map(SearchHistoryService::toDTO);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return searchHistoryRepository.findById(id)
+                .filter(history -> history.getUser().getId().equals(currentUserId))
+                .map(SearchHistoryService::toDTO);
     }
 
     public Optional<SearchHistoryDTO> createSearchHistory(CreateSearchHistoryRequest request) {
-        if (request.userId() == null) {
-            return Optional.empty();
-        }
-        Optional<User> userOptional = userRepository.findById(request.userId());
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        Optional<User> userOptional = userRepository.findById(currentUserId);
         if (userOptional.isEmpty()) {
             return Optional.empty();
         }
@@ -51,21 +54,22 @@ public class SearchHistoryService {
             return Optional.empty();
         }
         SearchHistory history = historyOptional.get();
-        User user = history.getUser();
-        if (request.userId() != null) {
-            Optional<User> userOptional = userRepository.findById(request.userId());
-            if (userOptional.isEmpty()) {
-                return Optional.empty();
-            }
-            user = userOptional.get();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (!history.getUser().getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
-        applyUpdateRequest(history, user, request);
+        applyUpdateRequest(history, request);
         return Optional.of(toDTO(searchHistoryRepository.save(history)));
     }
 
     public boolean deleteSearchHistory(Long id) {
-        if (!searchHistoryRepository.existsById(id)) {
+        Optional<SearchHistory> historyOptional = searchHistoryRepository.findById(id);
+        if (historyOptional.isEmpty()) {
             return false;
+        }
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (!historyOptional.get().getUser().getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
         searchHistoryRepository.deleteById(id);
         return true;
@@ -81,8 +85,7 @@ public class SearchHistoryService {
         history.setCreatedAt(LocalDateTime.now());
     }
 
-    private static void applyUpdateRequest(SearchHistory history, User user, UpdateSearchHistoryRequest request) {
-        history.setUser(user);
+    private static void applyUpdateRequest(SearchHistory history, UpdateSearchHistoryRequest request) {
         history.setOriginLocation(request.originLocation());
         history.setDestinationLocation(request.destinationLocation());
         history.setDepartureDate(request.departureDate());

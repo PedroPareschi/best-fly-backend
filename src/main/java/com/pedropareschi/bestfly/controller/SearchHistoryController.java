@@ -28,8 +28,8 @@ public class SearchHistoryController {
     private SearchHistoryService searchHistoryService;
 
     @GetMapping
-    public ResponseEntity<List<SearchHistoryDTO>> listSearchHistory(@RequestParam(required = false) Long userId) {
-        return ResponseEntity.ok(searchHistoryService.listSearchHistory(userId));
+    public ResponseEntity<List<SearchHistoryDTO>> listSearchHistory() {
+        return ResponseEntity.ok(searchHistoryService.listSearchHistory());
     }
 
     @GetMapping("/{id}")

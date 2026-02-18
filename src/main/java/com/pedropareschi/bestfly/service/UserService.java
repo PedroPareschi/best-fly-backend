@@ -5,8 +5,12 @@ import com.pedropareschi.bestfly.dto.UpdateUserRequest;
 import com.pedropareschi.bestfly.dto.UserDTO;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.UserRepository;
+import com.pedropareschi.bestfly.security.SecurityUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,34 +20,37 @@ import java.util.Optional;
 public class UserService {
 
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     public List<UserDTO> listUsers() {
-        return userRepository.findAll().stream()
-                .map(UserService::toDTO)
-                .toList();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return userRepository.findById(currentUserId)
+                .map(user -> List.of(toDTO(user)))
+                .orElseGet(List::of);
     }
 
     public Optional<UserDTO> getUser(Long id) {
+        requireSelf(id);
         return userRepository.findById(id).map(UserService::toDTO);
     }
 
-    public UserDTO createUser(CreateUserRequest request) {
-        User user = new User();
-        applyCreateRequest(user, request);
-        return toDTO(userRepository.save(user));
-    }
-
     public Optional<UserDTO> updateUser(Long id, UpdateUserRequest request) {
+        requireSelf(id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             return Optional.empty();
         }
         User user = userOptional.get();
-        applyUpdateRequest(user, request);
+        if (request.email() != null && !request.email().equals(user.getEmail())
+                && userRepository.existsByEmail(request.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+        applyUpdateRequest(user, request, passwordEncoder);
         return Optional.of(toDTO(userRepository.save(user)));
     }
 
     public boolean deleteUser(Long id) {
+        requireSelf(id);
         if (!userRepository.existsById(id)) {
             return false;
         }
@@ -51,20 +58,12 @@ public class UserService {
         return true;
     }
 
-    private static void applyCreateRequest(User user, CreateUserRequest request) {
-        user.setEmail(request.email());
-        user.setPassword(request.password());
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setCity(request.city());
-    }
-
-    private static void applyUpdateRequest(User user, UpdateUserRequest request) {
+    private static void applyUpdateRequest(User user, UpdateUserRequest request, PasswordEncoder passwordEncoder) {
         if (request.email() != null) {
             user.setEmail(request.email());
         }
         if (request.password() != null) {
-            user.setPassword(request.password());
+            user.setPassword(passwordEncoder.encode(request.password()));
         }
         if (request.firstName() != null) {
             user.setFirstName(request.firstName());
@@ -85,5 +84,12 @@ public class UserService {
                 user.getLastName(),
                 user.getCity()
         );
+    }
+
+    private static void requireSelf(Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (!currentUserId.equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
     }
 }

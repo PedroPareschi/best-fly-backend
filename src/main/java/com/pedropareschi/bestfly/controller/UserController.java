@@ -37,11 +37,6 @@ public class UserController {
         return ResponseEntity.of(user);
     }
 
-    @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
         Optional<UserDTO> user = userService.updateUser(id, request);

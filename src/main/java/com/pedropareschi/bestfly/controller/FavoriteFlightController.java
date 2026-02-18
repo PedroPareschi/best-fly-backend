@@ -28,8 +28,8 @@ public class FavoriteFlightController {
     private FavoriteFlightService favoriteFlightService;
 
     @GetMapping
-    public ResponseEntity<List<FavoriteFlightDTO>> listFavoriteFlights(@RequestParam(required = false) Long userId) {
-        return ResponseEntity.ok(favoriteFlightService.listFavoriteFlights(userId));
+    public ResponseEntity<List<FavoriteFlightDTO>> listFavoriteFlights() {
+        return ResponseEntity.ok(favoriteFlightService.listFavoriteFlights());
     }
 
     @GetMapping("/{id}")
