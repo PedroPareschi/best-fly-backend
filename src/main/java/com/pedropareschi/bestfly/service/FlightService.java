@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.DuffelFlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
@@ -16,7 +16,7 @@ public class FlightService {
 
     private DuffelService duffelService;
 
-    public DuffelFlightSearchResponseDTO searchFlights(
+    public FlightSearchResponseDTO searchFlights(
             String origin,
             String destination,
             String departureDate,
@@ -44,13 +44,13 @@ public class FlightService {
                 : null;
 
         if (offerRequestId == null) {
-            return new DuffelFlightSearchResponseDTO(Collections.emptyList(), new DuffelFlightSearchResponseDTO.PaginationDTO(null, null, limit));
+            return new FlightSearchResponseDTO(Collections.emptyList(), new FlightSearchResponseDTO.PaginationDTO(null, null, limit));
         }
 
         DuffelOfferListResponse offerListResponse = duffelService.listOffers(offerRequestId, limit, after);
-        List<DuffelFlightSearchResponseDTO.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
-        DuffelFlightSearchResponseDTO.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
+        List<FlightSearchResponseDTO.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
+        FlightSearchResponseDTO.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
 
-        return new DuffelFlightSearchResponseDTO(offers, paginationDTO);
+        return new FlightSearchResponseDTO(offers, paginationDTO);
     }
 }

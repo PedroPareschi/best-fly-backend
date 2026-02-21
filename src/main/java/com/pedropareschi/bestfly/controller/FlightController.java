@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.controller;
 
-import com.pedropareschi.bestfly.dto.DuffelFlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
 import com.pedropareschi.bestfly.service.FlightService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class FlightController {
 
 
     @GetMapping
-    public ResponseEntity<DuffelFlightSearchResponseDTO> searchFlightsDuffel(
+    public ResponseEntity<FlightSearchResponseDTO> searchFlightsDuffel(
             @RequestParam String origin,
             @RequestParam String destination,
             @RequestParam String departureDate,
