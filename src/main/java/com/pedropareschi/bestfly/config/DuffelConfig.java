@@ -1,0 +1,19 @@
+package com.pedropareschi.bestfly.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+@Configuration
+public class DuffelConfig {
+
+    @Bean(name = "duffelRestClient")
+    public RestClient duffelRestClient(@Value("${duffel.token}") String token) {
+        return RestClient.builder()
+                .baseUrl("https://api.duffel.com")
+                .defaultHeader("Authorization", "Bearer " + token)
+                .defaultHeader("Duffel-Version", "v2")
+                .build();
+    }
+}

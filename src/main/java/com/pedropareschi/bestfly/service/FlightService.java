@@ -1,35 +1,56 @@
 package com.pedropareschi.bestfly.service;
 
-import com.amadeus.exceptions.ResponseException;
-import com.amadeus.resources.FlightOfferSearch;
-import com.pedropareschi.bestfly.dto.AirlineDTO;
-import com.pedropareschi.bestfly.dto.FlightDTO;
+import com.pedropareschi.bestfly.dto.DuffelFlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
+import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class FlightService {
 
-    private AmadeusService amadeusService;
-    private AirlineService airlineService;
+    private DuffelService duffelService;
 
-    public List<FlightDTO> searchFlights(String originLocation, String destinationLocation, String departureDate, int numberOfAdults, String returnDate, int max) throws ResponseException {
-        FlightOfferSearch[] searchResponse = amadeusService.searchFlights(originLocation, destinationLocation, departureDate, numberOfAdults, returnDate, max);
-        Set<String> airlineCodesSet = new LinkedHashSet<>();
-        for (FlightOfferSearch offer : searchResponse) {
-            airlineCodesSet.add((offer.getValidatingAirlineCodes() != null &&
-                    offer.getValidatingAirlineCodes().length > 0)
-                    ? offer.getValidatingAirlineCodes()[0]
-                    : "Unknown");
+    public DuffelFlightSearchResponseDTO searchFlights(
+            String origin,
+            String destination,
+            String departureDate,
+            String departureTime,
+            int numberOfAdults,
+            int numberOfChildren,
+            String returnDate,
+            String returnTime,
+            int limit,
+            String after
+    ) {
+        DuffelOfferRequestResponse offerRequestResponse = duffelService.createOfferRequest(
+                origin,
+                destination,
+                departureDate,
+                departureTime,
+                numberOfAdults,
+                numberOfChildren,
+                returnDate,
+                returnTime
+        );
+
+        String offerRequestId = offerRequestResponse != null && offerRequestResponse.data() != null
+                ? offerRequestResponse.data().id()
+                : null;
+
+        if (offerRequestId == null) {
+            return new DuffelFlightSearchResponseDTO(Collections.emptyList(), new DuffelFlightSearchResponseDTO.PaginationDTO(null, null, limit));
         }
-        Map<String, AirlineDTO> airlines = airlineService.getAirlineInfo(airlineCodesSet);
-        return FlightMapper.toFlightSearchResponse(searchResponse, airlines);
+
+        DuffelOfferListResponse offerListResponse = duffelService.listOffers(offerRequestId, limit, after);
+        List<DuffelFlightSearchResponseDTO.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
+        DuffelFlightSearchResponseDTO.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
+
+        return new DuffelFlightSearchResponseDTO(offers, paginationDTO);
     }
 }

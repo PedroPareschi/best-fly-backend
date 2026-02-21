@@ -1,133 +1,145 @@
 package com.pedropareschi.bestfly.mapper;
 
-import com.amadeus.resources.FlightOfferSearch;
 import com.pedropareschi.bestfly.dto.AirlineDTO;
-import com.pedropareschi.bestfly.dto.FlightDTO;
+import com.pedropareschi.bestfly.dto.DuffelFlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FlightMapper {
 
-    public static List<FlightDTO> toFlightSearchResponse(FlightOfferSearch[] flightOffers, Map<String, AirlineDTO> airlines) {
-        if (flightOffers == null) {
-            return null;
+    public static List<DuffelFlightSearchResponseDTO.DuffelFlightOfferDTO> mapDuffelOffers(DuffelOfferListResponse offerListResponse) {
+        if (offerListResponse == null || offerListResponse.data() == null) {
+            return Collections.emptyList();
         }
 
-        List<FlightDTO> flights = new ArrayList<>();
-
-        for (FlightOfferSearch offer : flightOffers) {
-
-            String airlineCode = (offer.getValidatingAirlineCodes() != null &&
-                    offer.getValidatingAirlineCodes().length > 0)
-                    ? offer.getValidatingAirlineCodes()[0]
-                    : "Unknown";
-
-            FlightDTO.FlightPriceDTO priceDTO =
-                    new FlightDTO.FlightPriceDTO(
-                            offer.getPrice().getGrandTotal(),
-                            offer.getPrice().getCurrency()
-                    );
-
-            FlightDTO.FlightPricingDTO pricingDTO = extractPricing(offer);
-
-            List<FlightDTO.ItineraryDTO> itineraries = mapItineraries(offer);
-
-            AirlineDTO airline = airlines.get(airlineCode);
-
-            FlightDTO dto = new FlightDTO(
-                    offer.getNumberOfBookableSeats(),
-                    priceDTO,
-                    airline,
-                    pricingDTO,
-                    itineraries
-            );
-
-            flights.add(dto);
-        }
-
-        return flights;
-    }
-
-    private static List<FlightDTO.ItineraryDTO> mapItineraries(FlightOfferSearch offer) {
-        List<FlightDTO.ItineraryDTO> itineraries = new ArrayList<>();
-
-        if (offer.getItineraries() == null) return itineraries;
-
-        for (FlightOfferSearch.Itinerary itinerary : offer.getItineraries()) {
-
-            List<FlightDTO.SegmentDTO> segments = new ArrayList<>();
-
-            if (itinerary.getSegments() != null) {
-                for (FlightOfferSearch.SearchSegment segment : itinerary.getSegments()) {
-
-                    FlightDTO.AirportDTO departure =
-                            new FlightDTO.AirportDTO(
-                                    segment.getDeparture().getIataCode(),
-                                    segment.getDeparture().getAt(),
-                                    segment.getDeparture().getTerminal()
-                            );
-
-                    FlightDTO.SegmentDTO segmentDTO = getSegmentDTO(segment, departure);
-
-                    segments.add(segmentDTO);
-                }
+        List<DuffelFlightSearchResponseDTO.DuffelFlightOfferDTO> offers = new ArrayList<>();
+        for (DuffelOfferListResponse.Offer offer : offerListResponse.data()) {
+            List<DuffelOfferListResponse.Slice> slices = offer.slices();
+            if (slices == null || slices.isEmpty()) {
+                continue;
             }
 
-            itineraries.add(new FlightDTO.ItineraryDTO(
-                    itinerary.getDuration(),
-                    segments
+            DuffelOfferListResponse.Slice outboundSlice = slices.getFirst();
+            DuffelOfferListResponse.Slice inboundSlice = slices.size() > 1 ? slices.get(1) : null;
+
+            DuffelFlightSearchResponseDTO.SliceDTO outbound = mapDuffelSlice(outboundSlice);
+            DuffelFlightSearchResponseDTO.SliceDTO inbound = inboundSlice != null ? mapDuffelSlice(inboundSlice) : null;
+
+            AirlineDTO airline = resolveDuffelAirline(outboundSlice);
+
+            DuffelFlightSearchResponseDTO.PriceDTO price = new DuffelFlightSearchResponseDTO.PriceDTO(
+                    offer.total_amount(),
+                    offer.total_currency()
+            );
+
+            offers.add(new DuffelFlightSearchResponseDTO.DuffelFlightOfferDTO(
+                    price,
+                    outbound,
+                    inbound,
+                    airline
             ));
         }
 
-        return itineraries;
+        return offers;
     }
 
-    private static FlightDTO.SegmentDTO getSegmentDTO(FlightOfferSearch.SearchSegment segment, FlightDTO.AirportDTO departure) {
-        FlightDTO.AirportDTO arrival =
-                new FlightDTO.AirportDTO(
-                        segment.getArrival().getIataCode(),
-                        segment.getArrival().getAt(),
-                        segment.getArrival().getTerminal()
-                );
-
-        return new FlightDTO.SegmentDTO(
-                segment.getCarrierCode() + segment.getNumber(),
-                segment.getAircraft() != null ? segment.getAircraft().getCode() : "Unknown",
-                departure,
-                arrival
+    public static DuffelFlightSearchResponseDTO.PaginationDTO mapDuffelPagination(DuffelOfferListResponse offerListResponse, int limit) {
+        return new DuffelFlightSearchResponseDTO.PaginationDTO(
+                offerListResponse != null && offerListResponse.meta() != null ? offerListResponse.meta().after() : null,
+                offerListResponse != null && offerListResponse.meta() != null ? offerListResponse.meta().before() : null,
+                limit
         );
     }
 
-    private static FlightDTO.FlightPricingDTO extractPricing(FlightOfferSearch offer) {
+    private static DuffelFlightSearchResponseDTO.SliceDTO mapDuffelSlice(DuffelOfferListResponse.Slice slice) {
+        if (slice == null) {
+            return null;
+        }
 
-        boolean refundableFare = false;
-        boolean noRestrictionFare = false;
-        boolean noPenaltyFare = false;
-        boolean includedCheckedBagsOnly = false;
+        List<DuffelOfferListResponse.Segment> segments = slice.segments();
+        String departureAt = null;
+        String arrivalAt = null;
+        if (segments != null && !segments.isEmpty()) {
+            departureAt = segments.getFirst().departing_at();
+            arrivalAt = segments.getLast().arriving_at();
+        }
 
-        if (offer.getTravelerPricings() != null &&
-                offer.getTravelerPricings().length > 0 &&
-                offer.getTravelerPricings()[0].getFareDetailsBySegment() != null &&
-                offer.getTravelerPricings()[0].getFareDetailsBySegment().length > 0) {
+        List<DuffelFlightSearchResponseDTO.StopDTO> stops = mapDuffelStops(segments);
 
-            FlightOfferSearch.PricingOptions pricingOptions = offer.getPricingOptions();
+        return new DuffelFlightSearchResponseDTO.SliceDTO(
+                slice.origin() != null ? slice.origin().iata_code() : null,
+                slice.destination() != null ? slice.destination().iata_code() : null,
+                departureAt,
+                arrivalAt,
+                slice.duration(),
+                stops.size(),
+                stops
+        );
+    }
 
-            refundableFare = pricingOptions.isRefundableFare();
-            noRestrictionFare = pricingOptions.isNoRestrictionFare();
-            noPenaltyFare = pricingOptions.isNoPenaltyFare();
+    private static List<DuffelFlightSearchResponseDTO.StopDTO> mapDuffelStops(List<DuffelOfferListResponse.Segment> segments) {
+        if (segments == null || segments.size() <= 1) {
+            return Collections.emptyList();
+        }
 
-            FlightOfferSearch.FareDetailsBySegment fare = offer.getTravelerPricings()[0].getFareDetailsBySegment()[0];
+        Map<String, DuffelFlightSearchResponseDTO.StopDTO> uniqueStops = new LinkedHashMap<>();
 
-            if (pricingOptions.isIncludedCheckedBagsOnly()) {
-                includedCheckedBagsOnly = fare.getIncludedCheckedBags().getWeight() > 0;
+        for (int i = 1; i < segments.size(); i++) {
+            DuffelOfferListResponse.Place place = segments.get(i).origin();
+            addDuffelStop(uniqueStops, place);
+        }
+
+        for (DuffelOfferListResponse.Segment segment : segments) {
+            if (segment.stops() == null) {
+                continue;
+            }
+            for (DuffelOfferListResponse.Stop stop : segment.stops()) {
+                addDuffelStop(uniqueStops, stop.airport());
             }
         }
 
-        return new FlightDTO.FlightPricingDTO(
-                includedCheckedBagsOnly,
-                refundableFare,
-                noRestrictionFare,
-                noPenaltyFare
+        return new ArrayList<>(uniqueStops.values());
+    }
+
+    private static void addDuffelStop(Map<String, DuffelFlightSearchResponseDTO.StopDTO> uniqueStops, DuffelOfferListResponse.Place place) {
+        if (place == null || place.iata_code() == null) {
+            return;
+        }
+        uniqueStops.putIfAbsent(place.iata_code(), new DuffelFlightSearchResponseDTO.StopDTO(
+                place.iata_code(),
+                place.name(),
+                place.city_name()
+        ));
+    }
+
+    private static AirlineDTO resolveDuffelAirline(DuffelOfferListResponse.Slice slice) {
+        if (slice == null || slice.segments() == null || slice.segments().isEmpty()) {
+            return null;
+        }
+
+        DuffelOfferListResponse.Segment firstSegment = slice.segments().getFirst();
+        DuffelOfferListResponse.Carrier carrier = firstSegment.operating_carrier() != null
+                ? firstSegment.operating_carrier()
+                : firstSegment.marketing_carrier();
+
+        if (carrier == null) {
+            return null;
+        }
+
+        String url = carrier.logo_symbol_url();
+        if (url == null || url.isBlank()) {
+            url = carrier.conditions_of_carriage_url();
+        }
+
+        return new AirlineDTO(
+                carrier.name(),
+                carrier.iata_code(),
+                url
         );
     }
 }
