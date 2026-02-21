@@ -6,9 +6,11 @@ import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 public class FlightMapper {
 
@@ -72,8 +74,8 @@ public class FlightMapper {
         List<DuffelFlightSearchResponseDTO.StopDTO> stops = mapDuffelStops(segments);
 
         return new DuffelFlightSearchResponseDTO.SliceDTO(
-                slice.origin() != null ? slice.origin().iata_code() : null,
-                slice.destination() != null ? slice.destination().iata_code() : null,
+                mapDuffelPlace(slice.origin()),
+                mapDuffelPlace(slice.destination()),
                 departureAt,
                 arrivalAt,
                 slice.duration(),
@@ -83,38 +85,95 @@ public class FlightMapper {
     }
 
     private static List<DuffelFlightSearchResponseDTO.StopDTO> mapDuffelStops(List<DuffelOfferListResponse.Segment> segments) {
-        if (segments == null || segments.size() <= 1) {
+        if (segments == null || segments.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Map<String, DuffelFlightSearchResponseDTO.StopDTO> uniqueStops = new LinkedHashMap<>();
+        List<DuffelFlightSearchResponseDTO.StopDTO> stops = new ArrayList<>();
 
-        for (int i = 1; i < segments.size(); i++) {
-            DuffelOfferListResponse.Place place = segments.get(i).origin();
-            addDuffelStop(uniqueStops, place);
-        }
+        for (int i = 0; i < segments.size(); i++) {
+            DuffelOfferListResponse.Segment segment = segments.get(i);
 
-        for (DuffelOfferListResponse.Segment segment : segments) {
+            if (i > 0) {
+                DuffelOfferListResponse.Segment previousSegment = segments.get(i - 1);
+                DuffelOfferListResponse.Place layoverPlace = segment.origin();
+                addDuffelStopWithTimes(
+                        stops,
+                        layoverPlace,
+                        previousSegment.arriving_at(),
+                        segment.departing_at()
+                );
+            }
+
             if (segment.stops() == null) {
                 continue;
             }
             for (DuffelOfferListResponse.Stop stop : segment.stops()) {
-                addDuffelStop(uniqueStops, stop.airport());
+                addDuffelStopWithTimes(
+                        stops,
+                        stop.airport(),
+                        stop.arrival_at(),
+                        stop.departure_at()
+                );
             }
         }
 
-        return new ArrayList<>(uniqueStops.values());
+        return stops;
     }
 
-    private static void addDuffelStop(Map<String, DuffelFlightSearchResponseDTO.StopDTO> uniqueStops, DuffelOfferListResponse.Place place) {
+    private static void addDuffelStopWithTimes(
+            List<DuffelFlightSearchResponseDTO.StopDTO> stops,
+            DuffelOfferListResponse.Place place,
+            String arrivalAt,
+            String departureAt
+    ) {
         if (place == null || place.iata_code() == null) {
             return;
         }
-        uniqueStops.putIfAbsent(place.iata_code(), new DuffelFlightSearchResponseDTO.StopDTO(
+
+        String waitDuration = calculateWaitDuration(arrivalAt, departureAt);
+        DuffelFlightSearchResponseDTO.PlaceDTO placeDTO = mapDuffelPlace(place);
+        stops.add(new DuffelFlightSearchResponseDTO.StopDTO(
+                placeDTO,
+                arrivalAt,
+                waitDuration,
+                departureAt
+        ));
+    }
+
+    private static DuffelFlightSearchResponseDTO.PlaceDTO mapDuffelPlace(DuffelOfferListResponse.Place place) {
+        if (place == null) {
+            return null;
+        }
+        return new DuffelFlightSearchResponseDTO.PlaceDTO(
                 place.iata_code(),
                 place.name(),
                 place.city_name()
-        ));
+        );
+    }
+
+    private static String calculateWaitDuration(String arrivalAt, String departureAt) {
+        if (arrivalAt == null || departureAt == null) {
+            return null;
+        }
+
+        try {
+            OffsetDateTime arrival = OffsetDateTime.parse(arrivalAt);
+            OffsetDateTime departure = OffsetDateTime.parse(departureAt);
+            Duration duration = Duration.between(arrival, departure);
+            return duration.toString();
+        } catch (DateTimeParseException ex) {
+            // Some providers return local timestamps without offset.
+        }
+
+        try {
+            LocalDateTime arrival = LocalDateTime.parse(arrivalAt);
+            LocalDateTime departure = LocalDateTime.parse(departureAt);
+            Duration duration = Duration.between(arrival, departure);
+            return duration.toString();
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
     }
 
     private static AirlineDTO resolveDuffelAirline(DuffelOfferListResponse.Slice slice) {

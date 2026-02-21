@@ -29,8 +29,8 @@ public record DuffelFlightSearchResponseDTO(
     }
 
     public record SliceDTO(
-            String origin,
-            String destination,
+            PlaceDTO origin,
+            PlaceDTO destination,
             String departureAt,
             String arrivalAt,
             String duration,
@@ -39,10 +39,18 @@ public record DuffelFlightSearchResponseDTO(
     ) {
     }
 
-    public record StopDTO(
+    public record PlaceDTO(
             String airportCode,
             String name,
             String city
+    ) {
+    }
+
+    public record StopDTO(
+            PlaceDTO place,
+            String arrivalAt,
+            String waitDuration,
+            String departureAt
     ) {
     }
 }
