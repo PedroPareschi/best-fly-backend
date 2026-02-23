@@ -3,6 +3,7 @@ package com.pedropareschi.bestfly.service;
 import com.pedropareschi.bestfly.dto.duffel.DuffelCreateOfferRequest;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
+import com.pedropareschi.bestfly.dto.duffel.DuffelPlaceSuggestionsResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -72,6 +73,16 @@ public class DuffelService {
                 })
                 .retrieve()
                 .body(DuffelOfferListResponse.class);
+    }
+
+    public DuffelPlaceSuggestionsResponse listPlaceSuggestions(String query) {
+        return duffelRestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/places/suggestions")
+                        .queryParam("query", query)
+                        .build())
+                .retrieve()
+                .body(DuffelPlaceSuggestionsResponse.class);
     }
 
     private DuffelCreateOfferRequest.Slice buildSlice(String origin, String destination, String date, String time) {

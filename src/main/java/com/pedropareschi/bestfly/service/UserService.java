@@ -71,9 +71,6 @@ public class UserService {
         if (request.lastName() != null) {
             user.setLastName(request.lastName());
         }
-        if (request.city() != null) {
-            user.setCity(request.city());
-        }
     }
 
     private static UserDTO toDTO(User user) {
@@ -81,8 +78,7 @@ public class UserService {
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
-                user.getLastName(),
-                user.getCity()
+                user.getLastName()
         );
     }
 
