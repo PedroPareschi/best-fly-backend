@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,6 +21,21 @@ public class FavoriteFlight {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private LocalDateTime createdAt;
-    private double price;
-    private String details;
+    private BigDecimal priceAmount;
+    private String priceCurrency;
+    private String airlineName;
+    private String airlineIata;
+    private String airlineLogoUrl;
+    private String outboundOriginAirportCode;
+    private String outboundOriginCity;
+    private String outboundDestinationAirportCode;
+    private String outboundDestinationCity;
+    private String outboundDepartureAt;
+    private String outboundArrivalAt;
+    private String outboundDuration;
+    private int outboundStopsCount;
+    private String inboundDepartureAt;
+    private String inboundArrivalAt;
+    private String inboundDuration;
+    private Integer inboundStopsCount;
 }

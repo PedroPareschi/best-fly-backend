@@ -2,6 +2,7 @@ package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.CreateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.dto.FavoriteFlightDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
 import com.pedropareschi.bestfly.dto.UpdateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.entity.FavoriteFlight;
 import com.pedropareschi.bestfly.entity.User;
@@ -77,14 +78,12 @@ public class FavoriteFlightService {
 
     private static void applyCreateRequest(FavoriteFlight favorite, User user, CreateFavoriteFlightRequest request) {
         favorite.setUser(user);
-        favorite.setPrice(request.price());
-        favorite.setDetails(request.details());
+        applyOffer(favorite, request.offer());
         favorite.setCreatedAt(LocalDateTime.now());
     }
 
     private static void applyUpdateRequest(FavoriteFlight favorite, UpdateFavoriteFlightRequest request) {
-        favorite.setPrice(request.price());
-        favorite.setDetails(request.details());
+        applyOffer(favorite, request.offer());
     }
 
     private static FavoriteFlightDTO toDTO(FavoriteFlight favorite) {
@@ -92,8 +91,73 @@ public class FavoriteFlightService {
                 favorite.getId(),
                 favorite.getUser().getId(),
                 favorite.getCreatedAt(),
-                favorite.getPrice(),
-                favorite.getDetails()
+                favorite.getPriceAmount(),
+                favorite.getPriceCurrency(),
+                favorite.getAirlineName(),
+                favorite.getAirlineIata(),
+                favorite.getAirlineLogoUrl(),
+                favorite.getOutboundOriginAirportCode(),
+                favorite.getOutboundOriginCity(),
+                favorite.getOutboundDestinationAirportCode(),
+                favorite.getOutboundDestinationCity(),
+                favorite.getOutboundDepartureAt(),
+                favorite.getOutboundArrivalAt(),
+                favorite.getOutboundDuration(),
+                favorite.getOutboundStopsCount(),
+                favorite.getInboundDepartureAt(),
+                favorite.getInboundArrivalAt(),
+                favorite.getInboundDuration(),
+                favorite.getInboundStopsCount()
         );
+    }
+
+    private static void applyOffer(FavoriteFlight favorite, FlightSearchResponseDTO.DuffelFlightOfferDTO offer) {
+        if (offer == null) {
+            return;
+        }
+
+        FlightSearchResponseDTO.PriceDTO price = offer.price();
+        if (price != null) {
+            favorite.setPriceAmount(price.amount() != null ? new java.math.BigDecimal(price.amount()) : null);
+            favorite.setPriceCurrency(price.currency());
+        }
+
+        FlightSearchResponseDTO.AirlineDTO airline = offer.airline();
+        if (airline != null) {
+            favorite.setAirlineName(airline.name());
+            favorite.setAirlineIata(airline.iata());
+            favorite.setAirlineLogoUrl(airline.logo_url());
+        }
+
+        FlightSearchResponseDTO.SliceDTO outbound = offer.outbound();
+        if (outbound != null) {
+            FlightSearchResponseDTO.PlaceDTO origin = outbound.origin();
+            FlightSearchResponseDTO.PlaceDTO destination = outbound.destination();
+            if (origin != null) {
+                favorite.setOutboundOriginAirportCode(origin.airportCode());
+                favorite.setOutboundOriginCity(origin.city());
+            }
+            if (destination != null) {
+                favorite.setOutboundDestinationAirportCode(destination.airportCode());
+                favorite.setOutboundDestinationCity(destination.city());
+            }
+            favorite.setOutboundDepartureAt(outbound.departureAt());
+            favorite.setOutboundArrivalAt(outbound.arrivalAt());
+            favorite.setOutboundDuration(outbound.duration());
+            favorite.setOutboundStopsCount(outbound.stopsCount());
+        }
+
+        FlightSearchResponseDTO.SliceDTO inbound = offer.inbound();
+        if (inbound != null) {
+            favorite.setInboundDepartureAt(inbound.departureAt());
+            favorite.setInboundArrivalAt(inbound.arrivalAt());
+            favorite.setInboundDuration(inbound.duration());
+            favorite.setInboundStopsCount(inbound.stopsCount());
+        } else {
+            favorite.setInboundDepartureAt(null);
+            favorite.setInboundArrivalAt(null);
+            favorite.setInboundDuration(null);
+            favorite.setInboundStopsCount(null);
+        }
     }
 }
