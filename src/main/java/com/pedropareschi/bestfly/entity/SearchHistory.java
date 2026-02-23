@@ -8,7 +8,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,8 +21,8 @@ public class SearchHistory {
     private User user;
     private String originLocation;
     private String destinationLocation;
-    private LocalDate departureDate;
+    private LocalDateTime departureDate;
     private int numberOfAdults;
-    private LocalDate returnDate;
+    private LocalDateTime returnDate;
     private LocalDateTime createdAt;
 }

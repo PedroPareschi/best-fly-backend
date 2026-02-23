@@ -1,12 +1,17 @@
 package com.pedropareschi.bestfly.service;
 
+import com.pedropareschi.bestfly.dto.CreateSearchHistoryRequest;
 import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
+import com.pedropareschi.bestfly.security.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +20,7 @@ import java.util.List;
 public class FlightService {
 
     private DuffelService duffelService;
+    private SearchHistoryService searchHistoryService;
 
     public FlightSearchResponseDTO searchFlights(
             String origin,
@@ -51,6 +57,35 @@ public class FlightService {
         List<FlightSearchResponseDTO.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
         FlightSearchResponseDTO.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
 
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (currentUserId != null) {
+            LocalDateTime departureDateTime = toLocalDateTime(departureDate, departureTime);
+            LocalDateTime returnDateTime = toLocalDateTime(returnDate, returnTime);
+            CreateSearchHistoryRequest searchHistoryRequest = new CreateSearchHistoryRequest(
+                    currentUserId,
+                    offerRequestId,
+                    origin,
+                    destination,
+                    departureDateTime,
+                    numberOfAdults,
+                    numberOfChildren,
+                    returnDateTime
+            );
+            searchHistoryService.createSearchHistory(searchHistoryRequest);
+        }
+
         return new FlightSearchResponseDTO(offers, paginationDTO);
+    }
+
+    private static LocalDateTime toLocalDateTime(String date, String time) {
+        if (date == null || date.isBlank()) {
+            return null;
+        }
+        LocalDate parsedDate = LocalDate.parse(date);
+        if (time == null || time.isBlank()) {
+            return parsedDate.atStartOfDay();
+        }
+        LocalTime parsedTime = LocalTime.parse(time);
+        return LocalDateTime.of(parsedDate, parsedTime);
     }
 }

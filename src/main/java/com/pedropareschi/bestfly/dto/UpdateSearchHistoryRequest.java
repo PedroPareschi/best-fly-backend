@@ -1,13 +1,13 @@
 package com.pedropareschi.bestfly.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record UpdateSearchHistoryRequest(
         Long userId,
         String originLocation,
         String destinationLocation,
-        LocalDate departureDate,
+        LocalDateTime departureDate,
         int numberOfAdults,
-        LocalDate returnDate
+        LocalDateTime returnDate
 ) {
 }

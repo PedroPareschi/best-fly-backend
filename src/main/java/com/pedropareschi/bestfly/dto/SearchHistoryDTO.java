@@ -1,6 +1,5 @@
 package com.pedropareschi.bestfly.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record SearchHistoryDTO(
@@ -8,9 +7,9 @@ public record SearchHistoryDTO(
         Long userId,
         String originLocation,
         String destinationLocation,
-        LocalDate departureDate,
+        LocalDateTime departureDate,
         int numberOfAdults,
-        LocalDate returnDate,
+        LocalDateTime returnDate,
         LocalDateTime createdAt
 ) {
 }
