@@ -1,9 +1,9 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.CreateFavoriteFlightRequest;
+import com.pedropareschi.bestfly.dto.request.CreateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.dto.FavoriteFlightDTO;
-import com.pedropareschi.bestfly.dto.FlightSearchResponse;
-import com.pedropareschi.bestfly.dto.UpdateFavoriteFlightRequest;
+import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
+import com.pedropareschi.bestfly.dto.request.UpdateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.entity.FavoriteFlight;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.FavoriteFlightRepository;

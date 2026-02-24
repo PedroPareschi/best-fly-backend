@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.controller;
 
-import com.pedropareschi.bestfly.dto.FlightSearchResponse;
+import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
 import com.pedropareschi.bestfly.service.FlightService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

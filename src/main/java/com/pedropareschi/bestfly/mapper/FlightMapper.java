@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.mapper;
 
-import com.pedropareschi.bestfly.dto.FlightSearchResponse;
+import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 
 import java.util.ArrayList;

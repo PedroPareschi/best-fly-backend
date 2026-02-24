@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.CreateSearchHistoryRequest;
-import com.pedropareschi.bestfly.dto.FlightSearchResponse;
+import com.pedropareschi.bestfly.dto.request.CreateSearchHistoryRequest;
+import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;

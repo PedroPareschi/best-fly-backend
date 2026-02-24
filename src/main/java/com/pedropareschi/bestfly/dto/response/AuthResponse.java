@@ -1,4 +1,4 @@
-package com.pedropareschi.bestfly.dto;
+package com.pedropareschi.bestfly.dto.response;
 
 public record AuthResponse(
         String token,

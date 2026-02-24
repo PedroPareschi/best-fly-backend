@@ -1,8 +1,8 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.AuthRequest;
-import com.pedropareschi.bestfly.dto.AuthResponse;
-import com.pedropareschi.bestfly.dto.RegisterRequest;
+import com.pedropareschi.bestfly.dto.request.AuthRequest;
+import com.pedropareschi.bestfly.dto.response.AuthResponse;
+import com.pedropareschi.bestfly.dto.request.RegisterRequest;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.UserRepository;
 import com.pedropareschi.bestfly.security.JwtService;

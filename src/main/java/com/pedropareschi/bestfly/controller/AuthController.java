@@ -1,8 +1,8 @@
 package com.pedropareschi.bestfly.controller;
 
-import com.pedropareschi.bestfly.dto.AuthRequest;
-import com.pedropareschi.bestfly.dto.AuthResponse;
-import com.pedropareschi.bestfly.dto.RegisterRequest;
+import com.pedropareschi.bestfly.dto.request.AuthRequest;
+import com.pedropareschi.bestfly.dto.response.AuthResponse;
+import com.pedropareschi.bestfly.dto.request.RegisterRequest;
 import com.pedropareschi.bestfly.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.CreateSearchHistoryRequest;
+import com.pedropareschi.bestfly.dto.request.CreateSearchHistoryRequest;
 import com.pedropareschi.bestfly.dto.SearchHistoryDTO;
 import com.pedropareschi.bestfly.entity.SearchHistory;
 import com.pedropareschi.bestfly.entity.User;

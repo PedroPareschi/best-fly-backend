@@ -1,4 +1,4 @@
-package com.pedropareschi.bestfly.dto;
+package com.pedropareschi.bestfly.dto.response;
 
 import java.util.List;
 

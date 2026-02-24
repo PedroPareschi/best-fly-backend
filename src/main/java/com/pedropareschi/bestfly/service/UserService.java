@@ -1,7 +1,6 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.CreateUserRequest;
-import com.pedropareschi.bestfly.dto.UpdateUserRequest;
+import com.pedropareschi.bestfly.dto.request.UpdateUserRequest;
 import com.pedropareschi.bestfly.dto.UserDTO;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.UserRepository;
