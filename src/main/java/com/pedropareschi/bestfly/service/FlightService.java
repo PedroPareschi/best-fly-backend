@@ -62,7 +62,6 @@ public class FlightService {
             LocalDateTime departureDateTime = toLocalDateTime(departureDate, departureTime);
             LocalDateTime returnDateTime = toLocalDateTime(returnDate, returnTime);
             CreateSearchHistoryRequest searchHistoryRequest = new CreateSearchHistoryRequest(
-                    currentUserId,
                     offerRequestId,
                     origin,
                     destination,

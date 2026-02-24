@@ -38,21 +38,6 @@ public class SearchHistoryController {
         return ResponseEntity.of(history);
     }
 
-    @PostMapping
-    public ResponseEntity<SearchHistoryDTO> createSearchHistory(@RequestBody CreateSearchHistoryRequest request) {
-        Optional<SearchHistoryDTO> history = searchHistoryService.createSearchHistory(request);
-        if (history.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(history.get());
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<SearchHistoryDTO> updateSearchHistory(@PathVariable Long id, @RequestBody UpdateSearchHistoryRequest request) {
-        Optional<SearchHistoryDTO> history = searchHistoryService.updateSearchHistory(id, request);
-        return ResponseEntity.of(history);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSearchHistory(@PathVariable Long id) {
         if (!searchHistoryService.deleteSearchHistory(id)) {

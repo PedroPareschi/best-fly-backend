@@ -2,7 +2,6 @@ package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.CreateSearchHistoryRequest;
 import com.pedropareschi.bestfly.dto.SearchHistoryDTO;
-import com.pedropareschi.bestfly.dto.UpdateSearchHistoryRequest;
 import com.pedropareschi.bestfly.entity.SearchHistory;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.SearchHistoryRepository;
@@ -37,29 +36,15 @@ public class SearchHistoryService {
                 .map(SearchHistoryService::toDTO);
     }
 
-    public Optional<SearchHistoryDTO> createSearchHistory(CreateSearchHistoryRequest request) {
+    public void createSearchHistory(CreateSearchHistoryRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Optional<User> userOptional = userRepository.findById(currentUserId);
         if (userOptional.isEmpty()) {
-            return Optional.empty();
+            return;
         }
         SearchHistory history = new SearchHistory();
         applyCreateRequest(history, userOptional.get(), request);
-        return Optional.of(toDTO(searchHistoryRepository.save(history)));
-    }
-
-    public Optional<SearchHistoryDTO> updateSearchHistory(Long id, UpdateSearchHistoryRequest request) {
-        Optional<SearchHistory> historyOptional = searchHistoryRepository.findById(id);
-        if (historyOptional.isEmpty()) {
-            return Optional.empty();
-        }
-        SearchHistory history = historyOptional.get();
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-        if (!history.getUser().getId().equals(currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-        }
-        applyUpdateRequest(history, request);
-        return Optional.of(toDTO(searchHistoryRepository.save(history)));
+        toDTO(searchHistoryRepository.save(history));
     }
 
     public boolean deleteSearchHistory(Long id) {
@@ -83,14 +68,6 @@ public class SearchHistoryService {
         history.setNumberOfAdults(request.numberOfAdults());
         history.setReturnDate(request.returnDate());
         history.setCreatedAt(LocalDateTime.now());
-    }
-
-    private static void applyUpdateRequest(SearchHistory history, UpdateSearchHistoryRequest request) {
-        history.setOriginLocation(request.originLocation());
-        history.setDestinationLocation(request.destinationLocation());
-        history.setDepartureDate(request.departureDate());
-        history.setNumberOfAdults(request.numberOfAdults());
-        history.setReturnDate(request.returnDate());
     }
 
     private static SearchHistoryDTO toDTO(SearchHistory history) {
