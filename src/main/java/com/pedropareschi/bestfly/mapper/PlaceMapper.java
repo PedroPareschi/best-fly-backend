@@ -27,7 +27,11 @@ public class PlaceMapper {
                 continue;
             }
 
-            if ("city".equalsIgnoreCase(place.type()) && place.airports() != null) {
+            if ("city".equalsIgnoreCase(place.type())) {
+                addPlace(unique, place.iata_code(), place.name(), null);
+                if (place.airports() == null) {
+                    continue;
+                }
                 for (DuffelPlaceSuggestionsResponse.Airport airport : place.airports()) {
                     if (airport == null) {
                         continue;
