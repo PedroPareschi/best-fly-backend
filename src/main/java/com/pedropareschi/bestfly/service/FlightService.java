@@ -56,22 +56,23 @@ public class FlightService {
         DuffelOfferListResponse offerListResponse = duffelService.listOffers(offerRequestId, limit, after);
         List<FlightSearchResponse.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
         FlightSearchResponse.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
-
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-        if (currentUserId != null) {
-            LocalDateTime departureDateTime = toLocalDateTime(departureDate, departureTime);
-            LocalDateTime returnDateTime = toLocalDateTime(returnDate, returnTime);
-            CreateSearchHistoryRequest searchHistoryRequest = new CreateSearchHistoryRequest(
-                    offerRequestId,
-                    origin,
-                    destination,
-                    departureDateTime,
-                    numberOfAdults,
-                    numberOfChildren,
-                    returnDateTime
-            );
-            searchHistoryService.createSearchHistory(searchHistoryRequest);
-        }
+        try {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
+            if (currentUserId != null) {
+                LocalDateTime departureDateTime = toLocalDateTime(departureDate, departureTime);
+                LocalDateTime returnDateTime = toLocalDateTime(returnDate, returnTime);
+                CreateSearchHistoryRequest searchHistoryRequest = new CreateSearchHistoryRequest(
+                        offerRequestId,
+                        origin,
+                        destination,
+                        departureDateTime,
+                        numberOfAdults,
+                        numberOfChildren,
+                        returnDateTime
+                );
+                searchHistoryService.createSearchHistory(searchHistoryRequest);
+            }
+        } catch (Exception ignore) {}
 
         return new FlightSearchResponse(offers, paginationDTO);
     }

@@ -25,7 +25,8 @@ public record FlightSearchResponse(
     public record AirlineDTO(
             String name,
             String iata,
-            String logo_url
+            String logoUrl,
+            String conditionsOfCarriageUrl
     ) {
     }
 

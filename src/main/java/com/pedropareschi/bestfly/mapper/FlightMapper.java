@@ -189,15 +189,14 @@ public class FlightMapper {
             return null;
         }
 
-        String url = carrier.logo_symbol_url();
-        if (url == null || url.isBlank()) {
-            url = carrier.conditions_of_carriage_url();
-        }
+        String logoUrl = carrier.logo_symbol_url();
+        String conditionsOfCarriageUrl = carrier.conditions_of_carriage_url();
 
         return new FlightSearchResponse.AirlineDTO(
                 carrier.name(),
                 carrier.iata_code(),
-                url
+                logoUrl,
+                conditionsOfCarriageUrl
         );
     }
 }

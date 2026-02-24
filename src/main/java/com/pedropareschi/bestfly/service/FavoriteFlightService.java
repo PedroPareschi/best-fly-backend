@@ -126,7 +126,7 @@ public class FavoriteFlightService {
         if (airline != null) {
             favorite.setAirlineName(airline.name());
             favorite.setAirlineIata(airline.iata());
-            favorite.setAirlineLogoUrl(airline.logo_url());
+            favorite.setAirlineLogoUrl(airline.logoUrl());
         }
 
         FlightSearchResponse.SliceDTO outbound = offer.outbound();
