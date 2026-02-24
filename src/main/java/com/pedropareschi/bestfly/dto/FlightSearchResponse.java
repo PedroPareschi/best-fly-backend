@@ -2,7 +2,7 @@ package com.pedropareschi.bestfly.dto;
 
 import java.util.List;
 
-public record FlightSearchResponseDTO(
+public record FlightSearchResponse(
         List<DuffelFlightOfferDTO> offers,
         PaginationDTO pagination
 ) {

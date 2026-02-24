@@ -2,7 +2,7 @@ package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.CreateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.dto.FavoriteFlightDTO;
-import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.UpdateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.entity.FavoriteFlight;
 import com.pedropareschi.bestfly.entity.User;
@@ -111,28 +111,28 @@ public class FavoriteFlightService {
         );
     }
 
-    private static void applyOffer(FavoriteFlight favorite, FlightSearchResponseDTO.DuffelFlightOfferDTO offer) {
+    private static void applyOffer(FavoriteFlight favorite, FlightSearchResponse.DuffelFlightOfferDTO offer) {
         if (offer == null) {
             return;
         }
 
-        FlightSearchResponseDTO.PriceDTO price = offer.price();
+        FlightSearchResponse.PriceDTO price = offer.price();
         if (price != null) {
             favorite.setPriceAmount(price.amount() != null ? new java.math.BigDecimal(price.amount()) : null);
             favorite.setPriceCurrency(price.currency());
         }
 
-        FlightSearchResponseDTO.AirlineDTO airline = offer.airline();
+        FlightSearchResponse.AirlineDTO airline = offer.airline();
         if (airline != null) {
             favorite.setAirlineName(airline.name());
             favorite.setAirlineIata(airline.iata());
             favorite.setAirlineLogoUrl(airline.logo_url());
         }
 
-        FlightSearchResponseDTO.SliceDTO outbound = offer.outbound();
+        FlightSearchResponse.SliceDTO outbound = offer.outbound();
         if (outbound != null) {
-            FlightSearchResponseDTO.PlaceDTO origin = outbound.origin();
-            FlightSearchResponseDTO.PlaceDTO destination = outbound.destination();
+            FlightSearchResponse.PlaceDTO origin = outbound.origin();
+            FlightSearchResponse.PlaceDTO destination = outbound.destination();
             if (origin != null) {
                 favorite.setOutboundOriginAirportCode(origin.airportCode());
                 favorite.setOutboundOriginCity(origin.city());
@@ -147,7 +147,7 @@ public class FavoriteFlightService {
             favorite.setOutboundStopsCount(outbound.stopsCount());
         }
 
-        FlightSearchResponseDTO.SliceDTO inbound = offer.inbound();
+        FlightSearchResponse.SliceDTO inbound = offer.inbound();
         if (inbound != null) {
             favorite.setInboundDepartureAt(inbound.departureAt());
             favorite.setInboundArrivalAt(inbound.arrivalAt());

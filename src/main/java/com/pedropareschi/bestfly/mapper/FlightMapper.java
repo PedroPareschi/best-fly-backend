@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.mapper;
 
-import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 
 import java.util.ArrayList;
@@ -13,12 +13,12 @@ import java.time.format.DateTimeParseException;
 
 public class FlightMapper {
 
-    public static List<FlightSearchResponseDTO.DuffelFlightOfferDTO> mapDuffelOffers(DuffelOfferListResponse offerListResponse) {
+    public static List<FlightSearchResponse.DuffelFlightOfferDTO> mapDuffelOffers(DuffelOfferListResponse offerListResponse) {
         if (offerListResponse == null || offerListResponse.data() == null) {
             return Collections.emptyList();
         }
 
-        List<FlightSearchResponseDTO.DuffelFlightOfferDTO> offers = new ArrayList<>();
+        List<FlightSearchResponse.DuffelFlightOfferDTO> offers = new ArrayList<>();
         for (DuffelOfferListResponse.Offer offer : offerListResponse.data()) {
             List<DuffelOfferListResponse.Slice> slices = offer.slices();
             if (slices == null || slices.isEmpty()) {
@@ -28,17 +28,17 @@ public class FlightMapper {
             DuffelOfferListResponse.Slice outboundSlice = slices.getFirst();
             DuffelOfferListResponse.Slice inboundSlice = slices.size() > 1 ? slices.get(1) : null;
 
-            FlightSearchResponseDTO.SliceDTO outbound = mapDuffelSlice(outboundSlice);
-            FlightSearchResponseDTO.SliceDTO inbound = inboundSlice != null ? mapDuffelSlice(inboundSlice) : null;
+            FlightSearchResponse.SliceDTO outbound = mapDuffelSlice(outboundSlice);
+            FlightSearchResponse.SliceDTO inbound = inboundSlice != null ? mapDuffelSlice(inboundSlice) : null;
 
-            FlightSearchResponseDTO.AirlineDTO airline = resolveDuffelAirline(outboundSlice);
+            FlightSearchResponse.AirlineDTO airline = resolveDuffelAirline(outboundSlice);
 
-            FlightSearchResponseDTO.PriceDTO price = new FlightSearchResponseDTO.PriceDTO(
+            FlightSearchResponse.PriceDTO price = new FlightSearchResponse.PriceDTO(
                     offer.total_amount(),
                     offer.total_currency()
             );
 
-            offers.add(new FlightSearchResponseDTO.DuffelFlightOfferDTO(
+            offers.add(new FlightSearchResponse.DuffelFlightOfferDTO(
                     price,
                     outbound,
                     inbound,
@@ -49,15 +49,15 @@ public class FlightMapper {
         return offers;
     }
 
-    public static FlightSearchResponseDTO.PaginationDTO mapDuffelPagination(DuffelOfferListResponse offerListResponse, int limit) {
-        return new FlightSearchResponseDTO.PaginationDTO(
+    public static FlightSearchResponse.PaginationDTO mapDuffelPagination(DuffelOfferListResponse offerListResponse, int limit) {
+        return new FlightSearchResponse.PaginationDTO(
                 offerListResponse != null && offerListResponse.meta() != null ? offerListResponse.meta().after() : null,
                 offerListResponse != null && offerListResponse.meta() != null ? offerListResponse.meta().before() : null,
                 limit
         );
     }
 
-    private static FlightSearchResponseDTO.SliceDTO mapDuffelSlice(DuffelOfferListResponse.Slice slice) {
+    private static FlightSearchResponse.SliceDTO mapDuffelSlice(DuffelOfferListResponse.Slice slice) {
         if (slice == null) {
             return null;
         }
@@ -70,9 +70,9 @@ public class FlightMapper {
             arrivalAt = segments.getLast().arriving_at();
         }
 
-        List<FlightSearchResponseDTO.StopDTO> stops = mapDuffelStops(segments);
+        List<FlightSearchResponse.StopDTO> stops = mapDuffelStops(segments);
 
-        return new FlightSearchResponseDTO.SliceDTO(
+        return new FlightSearchResponse.SliceDTO(
                 mapDuffelPlace(slice.origin()),
                 mapDuffelPlace(slice.destination()),
                 departureAt,
@@ -83,12 +83,12 @@ public class FlightMapper {
         );
     }
 
-    private static List<FlightSearchResponseDTO.StopDTO> mapDuffelStops(List<DuffelOfferListResponse.Segment> segments) {
+    private static List<FlightSearchResponse.StopDTO> mapDuffelStops(List<DuffelOfferListResponse.Segment> segments) {
         if (segments == null || segments.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<FlightSearchResponseDTO.StopDTO> stops = new ArrayList<>();
+        List<FlightSearchResponse.StopDTO> stops = new ArrayList<>();
 
         for (int i = 0; i < segments.size(); i++) {
             DuffelOfferListResponse.Segment segment = segments.get(i);
@@ -121,7 +121,7 @@ public class FlightMapper {
     }
 
     private static void addDuffelStopWithTimes(
-            List<FlightSearchResponseDTO.StopDTO> stops,
+            List<FlightSearchResponse.StopDTO> stops,
             DuffelOfferListResponse.Place place,
             String arrivalAt,
             String departureAt
@@ -131,8 +131,8 @@ public class FlightMapper {
         }
 
         String waitDuration = calculateWaitDuration(arrivalAt, departureAt);
-        FlightSearchResponseDTO.PlaceDTO placeDTO = mapDuffelPlace(place);
-        stops.add(new FlightSearchResponseDTO.StopDTO(
+        FlightSearchResponse.PlaceDTO placeDTO = mapDuffelPlace(place);
+        stops.add(new FlightSearchResponse.StopDTO(
                 placeDTO,
                 arrivalAt,
                 waitDuration,
@@ -140,11 +140,11 @@ public class FlightMapper {
         ));
     }
 
-    private static FlightSearchResponseDTO.PlaceDTO mapDuffelPlace(DuffelOfferListResponse.Place place) {
+    private static FlightSearchResponse.PlaceDTO mapDuffelPlace(DuffelOfferListResponse.Place place) {
         if (place == null) {
             return null;
         }
-        return new FlightSearchResponseDTO.PlaceDTO(
+        return new FlightSearchResponse.PlaceDTO(
                 place.iata_code(),
                 place.name(),
                 place.city_name()
@@ -175,7 +175,7 @@ public class FlightMapper {
         }
     }
 
-    private static FlightSearchResponseDTO.AirlineDTO resolveDuffelAirline(DuffelOfferListResponse.Slice slice) {
+    private static FlightSearchResponse.AirlineDTO resolveDuffelAirline(DuffelOfferListResponse.Slice slice) {
         if (slice == null || slice.segments() == null || slice.segments().isEmpty()) {
             return null;
         }
@@ -194,7 +194,7 @@ public class FlightMapper {
             url = carrier.conditions_of_carriage_url();
         }
 
-        return new FlightSearchResponseDTO.AirlineDTO(
+        return new FlightSearchResponse.AirlineDTO(
                 carrier.name(),
                 carrier.iata_code(),
                 url

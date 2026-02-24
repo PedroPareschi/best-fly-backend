@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.dto;
 
 public record UpdateFavoriteFlightRequest(
-        FlightSearchResponseDTO.DuffelFlightOfferDTO offer
+        FlightSearchResponse.DuffelFlightOfferDTO offer
 ) {
 }

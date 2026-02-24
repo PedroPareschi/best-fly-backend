@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.CreateSearchHistoryRequest;
-import com.pedropareschi.bestfly.dto.FlightSearchResponseDTO;
+import com.pedropareschi.bestfly.dto.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
@@ -22,7 +22,7 @@ public class FlightService {
     private DuffelService duffelService;
     private SearchHistoryService searchHistoryService;
 
-    public FlightSearchResponseDTO searchFlights(
+    public FlightSearchResponse searchFlights(
             String origin,
             String destination,
             String departureDate,
@@ -50,12 +50,12 @@ public class FlightService {
                 : null;
 
         if (offerRequestId == null) {
-            return new FlightSearchResponseDTO(Collections.emptyList(), new FlightSearchResponseDTO.PaginationDTO(null, null, limit));
+            return new FlightSearchResponse(Collections.emptyList(), new FlightSearchResponse.PaginationDTO(null, null, limit));
         }
 
         DuffelOfferListResponse offerListResponse = duffelService.listOffers(offerRequestId, limit, after);
-        List<FlightSearchResponseDTO.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
-        FlightSearchResponseDTO.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
+        List<FlightSearchResponse.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
+        FlightSearchResponse.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
         if (currentUserId != null) {
@@ -73,7 +73,7 @@ public class FlightService {
             searchHistoryService.createSearchHistory(searchHistoryRequest);
         }
 
-        return new FlightSearchResponseDTO(offers, paginationDTO);
+        return new FlightSearchResponse(offers, paginationDTO);
     }
 
     private static LocalDateTime toLocalDateTime(String date, String time) {
