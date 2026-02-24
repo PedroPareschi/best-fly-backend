@@ -1,9 +1,9 @@
-package com.pedropareschi.bestfly.dto;
+package com.pedropareschi.bestfly.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record FavoriteFlightDTO(
+public record FavoriteFlightResponse(
         Long id,
         Long userId,
         LocalDateTime createdAt,

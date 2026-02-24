@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.controller;
 
-import com.pedropareschi.bestfly.dto.PlaceDTO;
+import com.pedropareschi.bestfly.dto.response.PlaceResponse;
 import com.pedropareschi.bestfly.service.PlaceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class PlaceController {
     private PlaceService placeService;
 
     @GetMapping
-    public ResponseEntity<List<PlaceDTO>> getPlaces(@RequestParam String query) {
+    public ResponseEntity<List<PlaceResponse>> getPlaces(@RequestParam String query) {
         return ResponseEntity.ok(placeService.searchPlaces(query));
     }
 }

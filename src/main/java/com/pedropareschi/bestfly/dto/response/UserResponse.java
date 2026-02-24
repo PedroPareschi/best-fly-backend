@@ -1,6 +1,6 @@
-package com.pedropareschi.bestfly.dto;
+package com.pedropareschi.bestfly.dto.response;
 
-public record UserDTO(
+public record UserResponse(
         Long id,
         String email,
         String firstName,

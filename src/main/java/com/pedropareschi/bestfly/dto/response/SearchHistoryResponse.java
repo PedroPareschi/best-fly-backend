@@ -1,8 +1,8 @@
-package com.pedropareschi.bestfly.dto;
+package com.pedropareschi.bestfly.dto.response;
 
 import java.time.LocalDateTime;
 
-public record SearchHistoryDTO(
+public record SearchHistoryResponse(
         Long id,
         Long userId,
         String originLocation,

@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.controller;
 
 import com.pedropareschi.bestfly.dto.request.UpdateUserRequest;
-import com.pedropareschi.bestfly.dto.UserDTO;
+import com.pedropareschi.bestfly.dto.response.UserResponse;
 import com.pedropareschi.bestfly.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +24,19 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> listUsers() {
+    public ResponseEntity<List<UserResponse>> listUsers() {
         return ResponseEntity.ok(userService.listUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
-        Optional<UserDTO> user = userService.getUser(id);
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
+        Optional<UserResponse> user = userService.getUser(id);
         return ResponseEntity.of(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
-        Optional<UserDTO> user = userService.updateUser(id, request);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+        Optional<UserResponse> user = userService.updateUser(id, request);
         return ResponseEntity.of(user);
     }
 

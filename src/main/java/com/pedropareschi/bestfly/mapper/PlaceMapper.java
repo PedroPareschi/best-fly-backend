@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.mapper;
 
-import com.pedropareschi.bestfly.dto.PlaceDTO;
+import com.pedropareschi.bestfly.dto.response.PlaceResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelPlaceSuggestionsResponse;
 
 import java.util.ArrayList;
@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class PlaceMapper {
 
-    public static List<PlaceDTO> mapDuffelPlaceSuggestions(DuffelPlaceSuggestionsResponse response) {
+    public static List<PlaceResponse> mapDuffelPlaceSuggestions(DuffelPlaceSuggestionsResponse response) {
         if (response == null || response.data() == null) {
             return List.of();
         }
 
-        Map<String, PlaceDTO> unique = new LinkedHashMap<>();
+        Map<String, PlaceResponse> unique = new LinkedHashMap<>();
 
         for (DuffelPlaceSuggestionsResponse.Place place : response.data()) {
             if (place == null) {
@@ -46,7 +46,7 @@ public class PlaceMapper {
     }
 
     private static void addPlace(
-            Map<String, PlaceDTO> unique,
+            Map<String, PlaceResponse> unique,
             String iataCode,
             String airportName,
             String cityName
@@ -54,6 +54,6 @@ public class PlaceMapper {
         if (iataCode == null || iataCode.isBlank()) {
             return;
         }
-        unique.putIfAbsent(iataCode, new PlaceDTO(iataCode, airportName, cityName));
+        unique.putIfAbsent(iataCode, new PlaceResponse(iataCode, airportName, cityName));
     }
 }

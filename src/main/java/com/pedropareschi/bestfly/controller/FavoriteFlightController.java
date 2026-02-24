@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.controller;
 
 import com.pedropareschi.bestfly.dto.request.CreateFavoriteFlightRequest;
-import com.pedropareschi.bestfly.dto.FavoriteFlightDTO;
+import com.pedropareschi.bestfly.dto.response.FavoriteFlightResponse;
 import com.pedropareschi.bestfly.dto.request.UpdateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.service.FavoriteFlightService;
 import lombok.AllArgsConstructor;
@@ -27,19 +27,19 @@ public class FavoriteFlightController {
     private FavoriteFlightService favoriteFlightService;
 
     @GetMapping
-    public ResponseEntity<List<FavoriteFlightDTO>> listFavoriteFlights() {
+    public ResponseEntity<List<FavoriteFlightResponse>> listFavoriteFlights() {
         return ResponseEntity.ok(favoriteFlightService.listFavoriteFlights());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FavoriteFlightDTO> getFavoriteFlight(@PathVariable Long id) {
-        Optional<FavoriteFlightDTO> favorite = favoriteFlightService.getFavoriteFlight(id);
+    public ResponseEntity<FavoriteFlightResponse> getFavoriteFlight(@PathVariable Long id) {
+        Optional<FavoriteFlightResponse> favorite = favoriteFlightService.getFavoriteFlight(id);
         return ResponseEntity.of(favorite);
     }
 
     @PostMapping
-    public ResponseEntity<FavoriteFlightDTO> createFavoriteFlight(@RequestBody CreateFavoriteFlightRequest request) {
-        Optional<FavoriteFlightDTO> favorite = favoriteFlightService.createFavoriteFlight(request);
+    public ResponseEntity<FavoriteFlightResponse> createFavoriteFlight(@RequestBody CreateFavoriteFlightRequest request) {
+        Optional<FavoriteFlightResponse> favorite = favoriteFlightService.createFavoriteFlight(request);
         if (favorite.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -47,8 +47,8 @@ public class FavoriteFlightController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FavoriteFlightDTO> updateFavoriteFlight(@PathVariable Long id, @RequestBody UpdateFavoriteFlightRequest request) {
-        Optional<FavoriteFlightDTO> favorite = favoriteFlightService.updateFavoriteFlight(id, request);
+    public ResponseEntity<FavoriteFlightResponse> updateFavoriteFlight(@PathVariable Long id, @RequestBody UpdateFavoriteFlightRequest request) {
+        Optional<FavoriteFlightResponse> favorite = favoriteFlightService.updateFavoriteFlight(id, request);
         return ResponseEntity.of(favorite);
     }
 

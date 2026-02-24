@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.request.UpdateUserRequest;
-import com.pedropareschi.bestfly.dto.UserDTO;
+import com.pedropareschi.bestfly.dto.response.UserResponse;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.UserRepository;
 import com.pedropareschi.bestfly.security.SecurityUtils;
@@ -21,19 +21,19 @@ public class UserService {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
-    public List<UserDTO> listUsers() {
+    public List<UserResponse> listUsers() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         return userRepository.findById(currentUserId)
                 .map(user -> List.of(toDTO(user)))
                 .orElseGet(List::of);
     }
 
-    public Optional<UserDTO> getUser(Long id) {
+    public Optional<UserResponse> getUser(Long id) {
         requireSelf(id);
         return userRepository.findById(id).map(UserService::toDTO);
     }
 
-    public Optional<UserDTO> updateUser(Long id, UpdateUserRequest request) {
+    public Optional<UserResponse> updateUser(Long id, UpdateUserRequest request) {
         requireSelf(id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
@@ -72,8 +72,8 @@ public class UserService {
         }
     }
 
-    private static UserDTO toDTO(User user) {
-        return new UserDTO(
+    private static UserResponse toDTO(User user) {
+        return new UserResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),

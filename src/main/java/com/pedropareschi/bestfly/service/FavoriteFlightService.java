@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.request.CreateFavoriteFlightRequest;
-import com.pedropareschi.bestfly.dto.FavoriteFlightDTO;
+import com.pedropareschi.bestfly.dto.response.FavoriteFlightResponse;
 import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.request.UpdateFavoriteFlightRequest;
 import com.pedropareschi.bestfly.entity.FavoriteFlight;
@@ -25,20 +25,20 @@ public class FavoriteFlightService {
     private FavoriteFlightRepository favoriteFlightRepository;
     private UserRepository userRepository;
 
-    public List<FavoriteFlightDTO> listFavoriteFlights() {
+    public List<FavoriteFlightResponse> listFavoriteFlights() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         List<FavoriteFlight> favorites = favoriteFlightRepository.findByUserId(currentUserId);
         return favorites.stream().map(FavoriteFlightService::toDTO).toList();
     }
 
-    public Optional<FavoriteFlightDTO> getFavoriteFlight(Long id) {
+    public Optional<FavoriteFlightResponse> getFavoriteFlight(Long id) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         return favoriteFlightRepository.findById(id)
                 .filter(favorite -> favorite.getUser().getId().equals(currentUserId))
                 .map(FavoriteFlightService::toDTO);
     }
 
-    public Optional<FavoriteFlightDTO> createFavoriteFlight(CreateFavoriteFlightRequest request) {
+    public Optional<FavoriteFlightResponse> createFavoriteFlight(CreateFavoriteFlightRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Optional<User> userOptional = userRepository.findById(currentUserId);
         if (userOptional.isEmpty()) {
@@ -49,7 +49,7 @@ public class FavoriteFlightService {
         return Optional.of(toDTO(favoriteFlightRepository.save(favorite)));
     }
 
-    public Optional<FavoriteFlightDTO> updateFavoriteFlight(Long id, UpdateFavoriteFlightRequest request) {
+    public Optional<FavoriteFlightResponse> updateFavoriteFlight(Long id, UpdateFavoriteFlightRequest request) {
         Optional<FavoriteFlight> favoriteOptional = favoriteFlightRepository.findById(id);
         if (favoriteOptional.isEmpty()) {
             return Optional.empty();
@@ -86,8 +86,8 @@ public class FavoriteFlightService {
         applyOffer(favorite, request.offer());
     }
 
-    private static FavoriteFlightDTO toDTO(FavoriteFlight favorite) {
-        return new FavoriteFlightDTO(
+    private static FavoriteFlightResponse toDTO(FavoriteFlight favorite) {
+        return new FavoriteFlightResponse(
                 favorite.getId(),
                 favorite.getUser().getId(),
                 favorite.getCreatedAt(),

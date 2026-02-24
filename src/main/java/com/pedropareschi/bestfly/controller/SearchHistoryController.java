@@ -1,6 +1,6 @@
 package com.pedropareschi.bestfly.controller;
 
-import com.pedropareschi.bestfly.dto.SearchHistoryDTO;
+import com.pedropareschi.bestfly.dto.response.SearchHistoryResponse;
 import com.pedropareschi.bestfly.service.SearchHistoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +21,13 @@ public class SearchHistoryController {
     private SearchHistoryService searchHistoryService;
 
     @GetMapping
-    public ResponseEntity<List<SearchHistoryDTO>> listSearchHistory() {
+    public ResponseEntity<List<SearchHistoryResponse>> listSearchHistory() {
         return ResponseEntity.ok(searchHistoryService.listSearchHistory());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SearchHistoryDTO> getSearchHistory(@PathVariable Long id) {
-        Optional<SearchHistoryDTO> history = searchHistoryService.getSearchHistory(id);
+    public ResponseEntity<SearchHistoryResponse> getSearchHistory(@PathVariable Long id) {
+        Optional<SearchHistoryResponse> history = searchHistoryService.getSearchHistory(id);
         return ResponseEntity.of(history);
     }
 

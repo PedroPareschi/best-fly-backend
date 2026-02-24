@@ -1,7 +1,7 @@
 package com.pedropareschi.bestfly.service;
 
 import com.pedropareschi.bestfly.dto.request.CreateSearchHistoryRequest;
-import com.pedropareschi.bestfly.dto.SearchHistoryDTO;
+import com.pedropareschi.bestfly.dto.response.SearchHistoryResponse;
 import com.pedropareschi.bestfly.entity.SearchHistory;
 import com.pedropareschi.bestfly.entity.User;
 import com.pedropareschi.bestfly.repository.SearchHistoryRepository;
@@ -23,13 +23,13 @@ public class SearchHistoryService {
     private SearchHistoryRepository searchHistoryRepository;
     private UserRepository userRepository;
 
-    public List<SearchHistoryDTO> listSearchHistory() {
+    public List<SearchHistoryResponse> listSearchHistory() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         List<SearchHistory> history = searchHistoryRepository.findByUserId(currentUserId);
         return history.stream().map(SearchHistoryService::toDTO).toList();
     }
 
-    public Optional<SearchHistoryDTO> getSearchHistory(Long id) {
+    public Optional<SearchHistoryResponse> getSearchHistory(Long id) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         return searchHistoryRepository.findById(id)
                 .filter(history -> history.getUser().getId().equals(currentUserId))
@@ -70,8 +70,8 @@ public class SearchHistoryService {
         history.setCreatedAt(LocalDateTime.now());
     }
 
-    private static SearchHistoryDTO toDTO(SearchHistory history) {
-        return new SearchHistoryDTO(
+    private static SearchHistoryResponse toDTO(SearchHistory history) {
+        return new SearchHistoryResponse(
                 history.getId(),
                 history.getUser().getId(),
                 history.getOriginLocation(),
