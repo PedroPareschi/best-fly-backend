@@ -60,6 +60,10 @@ public class DuffelService {
     }
 
     public DuffelOfferListResponse listOffers(String offerRequestId, int limit, String after) {
+        return listOffers(offerRequestId, limit, after, null);
+    }
+
+    public DuffelOfferListResponse listOffers(String offerRequestId, int limit, String after, String sort) {
         return duffelRestClient.get()
                 .uri(uriBuilder -> {
                     var builder = uriBuilder
@@ -68,6 +72,9 @@ public class DuffelService {
                             .queryParam("limit", limit);
                     if (after != null && !after.isBlank()) {
                         builder.queryParam("after", after);
+                    }
+                    if (sort != null && !sort.isBlank()) {
+                        builder.queryParam("sort", sort);
                     }
                     return builder.build();
                 })
