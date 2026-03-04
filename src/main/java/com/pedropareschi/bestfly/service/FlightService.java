@@ -1,17 +1,14 @@
 package com.pedropareschi.bestfly.service;
 
-import com.pedropareschi.bestfly.dto.request.CreateSearchHistoryRequest;
 import com.pedropareschi.bestfly.dto.response.FlightSearchResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferListResponse;
 import com.pedropareschi.bestfly.dto.duffel.DuffelOfferRequestResponse;
+import com.pedropareschi.bestfly.config.CacheConfig;
 import com.pedropareschi.bestfly.mapper.FlightMapper;
-import com.pedropareschi.bestfly.security.SecurityUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,8 +17,11 @@ import java.util.List;
 public class FlightService {
 
     private DuffelService duffelService;
-    private SearchHistoryService searchHistoryService;
 
+    @Cacheable(
+            cacheNames = CacheConfig.FLIGHT_SEARCH_CACHE,
+            key = "{#origin,#destination,#departureDate,#departureTime,#numberOfAdults,#numberOfChildren,#returnDate,#returnTime,#limit,#after}"
+    )
     public FlightSearchResponse searchFlights(
             String origin,
             String destination,
@@ -56,36 +56,7 @@ public class FlightService {
         DuffelOfferListResponse offerListResponse = duffelService.listOffers(offerRequestId, limit, after);
         List<FlightSearchResponse.DuffelFlightOfferDTO> offers = FlightMapper.mapDuffelOffers(offerListResponse);
         FlightSearchResponse.PaginationDTO paginationDTO = FlightMapper.mapDuffelPagination(offerListResponse, limit);
-        try {
-            Long currentUserId = SecurityUtils.getCurrentUserId();
-            if (currentUserId != null) {
-                LocalDateTime departureDateTime = toLocalDateTime(departureDate, departureTime);
-                LocalDateTime returnDateTime = toLocalDateTime(returnDate, returnTime);
-                CreateSearchHistoryRequest searchHistoryRequest = new CreateSearchHistoryRequest(
-                        offerRequestId,
-                        origin,
-                        destination,
-                        departureDateTime,
-                        numberOfAdults,
-                        numberOfChildren,
-                        returnDateTime
-                );
-                searchHistoryService.createSearchHistory(searchHistoryRequest);
-            }
-        } catch (Exception ignore) {}
 
         return new FlightSearchResponse(offers, paginationDTO);
-    }
-
-    private static LocalDateTime toLocalDateTime(String date, String time) {
-        if (date == null || date.isBlank()) {
-            return null;
-        }
-        LocalDate parsedDate = LocalDate.parse(date);
-        if (time == null || time.isBlank()) {
-            return parsedDate.atStartOfDay();
-        }
-        LocalTime parsedTime = LocalTime.parse(time);
-        return LocalDateTime.of(parsedDate, parsedTime);
     }
 }

@@ -16,6 +16,7 @@ import java.util.Map;
 public class CacheConfig {
 
     public static final String PLACE_SUGGESTIONS_CACHE = "placeSuggestions";
+    public static final String FLIGHT_SEARCH_CACHE = "flightSearch";
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
@@ -26,7 +27,8 @@ public class CacheConfig {
                 .disableCachingNullValues();
 
         Map<String, RedisCacheConfiguration> cacheConfigs = Map.of(
-                PLACE_SUGGESTIONS_CACHE, defaultConfig.entryTtl(Duration.ofHours(6))
+                PLACE_SUGGESTIONS_CACHE, defaultConfig.entryTtl(Duration.ofHours(6)),
+                FLIGHT_SEARCH_CACHE, defaultConfig.entryTtl(Duration.ofMinutes(5))
         );
 
         return RedisCacheManager.builder(connectionFactory)
