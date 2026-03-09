@@ -28,6 +28,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/best_fly
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      DUFFEL_TOKEN: ${DUFFEL_TOKEN}
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
     depends_on:
