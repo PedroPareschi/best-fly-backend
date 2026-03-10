@@ -2,6 +2,8 @@
 
 REST API for authentication, flight search, and management of users, favorite flights, and search history.
 
+Link here: https://bestflyapi.duckdns.org/swagger-ui/index.html
+
 ## Technologies
 - Java 25
 - Spring Boot 4
