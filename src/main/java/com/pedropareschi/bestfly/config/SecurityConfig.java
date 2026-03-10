@@ -34,7 +34,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(Customizer.withDefaults());
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
