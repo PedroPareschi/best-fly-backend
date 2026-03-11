@@ -27,22 +27,23 @@ import java.util.List;
         bearerFormat = "JWT"
 )
 public class OpenApiConfig {
-        @Value("${app.openapi.server-url:}")
+        @Value("${app.openapi.server-url:https://bestflyapi.duckdns.org}")
         private String openapiServerUrl;
 
         @Bean
         public OpenAPI customOpenAPI() {
                 OpenAPI openAPI = new OpenAPI();
-                if (openapiServerUrl != null && !openapiServerUrl.isBlank()) {
-                        Server server = new Server();
-                        server.setUrl(openapiServerUrl);
-                        openAPI.setServers(List.of(server));
-                }
+                Server server = new Server();
+                server.setUrl(openapiServerUrl);
+                openAPI.setServers(List.of(server));
                 return openAPI;
         }
 
         @Bean
-        public ForwardedHeaderFilter forwardedHeaderFilter() {
-                return new ForwardedHeaderFilter();
+        public org.springframework.boot.web.servlet.FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+                ForwardedHeaderFilter filter = new ForwardedHeaderFilter();
+                org.springframework.boot.web.servlet.FilterRegistrationBean<ForwardedHeaderFilter> registration = new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);
+                registration.setOrder(org.springframework.core.Ordered.HIGHEST_PRECEDENCE);
+                return registration;
         }
 }
