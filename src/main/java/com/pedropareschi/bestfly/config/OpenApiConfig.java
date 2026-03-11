@@ -38,12 +38,4 @@ public class OpenApiConfig {
                 openAPI.setServers(List.of(server));
                 return openAPI;
         }
-
-        @Bean
-        public org.springframework.boot.web.servlet.FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
-                ForwardedHeaderFilter filter = new ForwardedHeaderFilter();
-                org.springframework.boot.web.servlet.FilterRegistrationBean<ForwardedHeaderFilter> registration = new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);
-                registration.setOrder(org.springframework.core.Ordered.HIGHEST_PRECEDENCE);
-                return registration;
-        }
 }
