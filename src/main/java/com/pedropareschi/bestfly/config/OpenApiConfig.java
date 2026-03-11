@@ -29,13 +29,4 @@ import java.util.List;
 public class OpenApiConfig {
         @Value("${app.openapi.server-url:https://bestflyapi.duckdns.org}")
         private String openapiServerUrl;
-
-        @Bean
-        public OpenAPI customOpenAPI() {
-                OpenAPI openAPI = new OpenAPI();
-                Server server = new Server();
-                server.setUrl(openapiServerUrl);
-                openAPI.setServers(List.of(server));
-                return openAPI;
-        }
 }
