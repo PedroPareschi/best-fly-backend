@@ -26,6 +26,7 @@ services:
       - "8080:8080"
     environment:
       SPRINGDOC_SWAGGER_UI_URL: https://bestflyapi.duckdns.org/v3/api-docs
+      SERVER_FORWARD_HEADERS_STRATEGY: native
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/best_fly
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
