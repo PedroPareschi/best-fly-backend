@@ -1,43 +1,74 @@
-version: "3.8"
+version: "3.9"
+
 services:
+
   postgres:
     image: postgres:17
     container_name: bestfly-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: best_fly
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - bestfly-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d best_fly"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestfly-network
 
   redis:
     image: redis:8
     container_name: bestfly-redis
-    restart: always
+    restart: unless-stopped
+    command: redis-server --appendonly yes
     volumes:
       - bestfly-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - bestfly-network
 
   backend:
     build: .
     container_name: bestfly-backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRINGDOC_SWAGGER_UI_URL: https://bestflyapi.duckdns.org/v3/api-docs
       SERVER_FORWARD_HEADERS_STRATEGY: native
+
+      SPRINGDOC_SWAGGER_UI_URL: https://bestflyapi.duckdns.org/v3/api-docs
+
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/best_fly
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
       JWT_SECRET: ${JWT_SECRET}
       DUFFEL_TOKEN: ${DUFFEL_TOKEN}
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - bestfly-network
 
 volumes:
   bestfly-postgres-data:
   bestfly-redis-data:
+
+networks:
+  bestfly-network:
+    driver: bridge
