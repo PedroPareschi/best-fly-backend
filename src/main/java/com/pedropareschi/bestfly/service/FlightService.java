@@ -20,17 +20,15 @@ public class FlightService {
 
     @Cacheable(
             cacheNames = CacheConfig.FLIGHT_SEARCH_CACHE,
-            key = "{#origin,#destination,#departureDate,#departureTime,#numberOfAdults,#numberOfChildren,#returnDate,#returnTime,#limit,#after}"
+            key = "{#origin,#destination,#departureDate,#numberOfAdults,#numberOfChildren,#returnDate,#limit,#after}"
     )
     public FlightSearchResponse searchFlights(
             String origin,
             String destination,
             String departureDate,
-            String departureTime,
             int numberOfAdults,
             int numberOfChildren,
             String returnDate,
-            String returnTime,
             int limit,
             String after
     ) {
@@ -38,11 +36,9 @@ public class FlightService {
                 origin,
                 destination,
                 departureDate,
-                departureTime,
                 numberOfAdults,
                 numberOfChildren,
-                returnDate,
-                returnTime
+                returnDate
         );
 
         String offerRequestId = offerRequestResponse != null && offerRequestResponse.data() != null

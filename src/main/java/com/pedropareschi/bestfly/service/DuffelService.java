@@ -20,16 +20,14 @@ public class DuffelService {
         this.duffelRestClient = duffelRestClient;
     }
 
-    public DuffelOfferRequestResponse createOfferRequest(
+        public DuffelOfferRequestResponse createOfferRequest(
             String origin,
             String destination,
             String departureDate,
-            String departureTime,
             int numberOfAdults,
             int numberOfChildren,
-            String returnDate,
-            String returnTime
-    ) {
+            String returnDate
+        ) {
         List<DuffelCreateOfferRequest.Passenger> passengers = new ArrayList<>();
         for (int i = 0; i < numberOfAdults; i++) {
             passengers.add(new DuffelCreateOfferRequest.Passenger("adult"));
@@ -39,10 +37,10 @@ public class DuffelService {
         }
 
         List<DuffelCreateOfferRequest.Slice> slices = new ArrayList<>();
-        slices.add(buildSlice(origin, destination, departureDate, departureTime));
+        slices.add(buildSlice(origin, destination, departureDate));
 
         if (returnDate != null && !returnDate.isBlank()) {
-            slices.add(buildSlice(destination, origin, returnDate, returnTime));
+            slices.add(buildSlice(destination, origin, returnDate));
         }
 
         DuffelCreateOfferRequest payload = new DuffelCreateOfferRequest(
@@ -85,11 +83,7 @@ public class DuffelService {
                 .body(DuffelPlaceSuggestionsResponse.class);
     }
 
-    private DuffelCreateOfferRequest.Slice buildSlice(String origin, String destination, String date, String time) {
-        DuffelCreateOfferRequest.DepartureTime departureTime = null;
-        if (time != null && !time.isBlank()) {
-            departureTime = new DuffelCreateOfferRequest.DepartureTime(time, time);
-        }
-        return new DuffelCreateOfferRequest.Slice(origin, destination, date, departureTime);
+    private DuffelCreateOfferRequest.Slice buildSlice(String origin, String destination, String date) {
+        return new DuffelCreateOfferRequest.Slice(origin, destination, date);
     }
 }

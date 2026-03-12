@@ -46,11 +46,9 @@ class DuffelServiceTest {
                 "GRU",
                 "JFK",
                 "2026-01-01",
-                "08:00",
                 2,
                 1,
-                "2026-01-10",
-                "18:00"
+                "2026-01-10"
         );
 
         assertEquals("offer-req-1", response.data().id());

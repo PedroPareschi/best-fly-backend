@@ -31,15 +31,15 @@ class FlightControllerTest {
                 List.of(),
                 new FlightSearchResponse.PaginationDTO("after", "before", 20)
         );
-        when(flightService.searchFlights("GRU", "JFK", "2026-01-01", null, 1, 0, null, null, 20, null))
+        when(flightService.searchFlights("GRU", "JFK", "2026-01-01", 1, 0, null, 20, null))
                 .thenReturn(serviceResponse);
 
         ResponseEntity<FlightSearchResponse> response = flightController.searchFlightsDuffel(
-                "GRU", "JFK", "2026-01-01", null, 1, 0, null, null, 20, null
+                "GRU", "JFK", "2026-01-01", 1, 0, null, 20, null
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(serviceResponse, response.getBody());
-        verify(flightService).searchFlights("GRU", "JFK", "2026-01-01", null, 1, 0, null, null, 20, null);
+        verify(flightService).searchFlights("GRU", "JFK", "2026-01-01", 1, 0, null, 20, null);
     }
 }

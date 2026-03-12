@@ -42,16 +42,12 @@ public class FlightController {
             @RequestParam String destination,
             @Parameter(description = "Departure date in YYYY-MM-DD format", required = true, example = "2026-04-10")
             @RequestParam String departureDate,
-            @Parameter(description = "Departure time in HH:mm format (optional)", example = "09:30")
-            @RequestParam(required = false) String departureTime,
             @Parameter(description = "Number of adults", required = true, example = "1")
             @RequestParam int numberOfAdults,
             @Parameter(description = "Number of children", example = "0")
             @RequestParam(defaultValue = "0") int numberOfChildren,
             @Parameter(description = "Return date in YYYY-MM-DD format (optional)", example = "2026-04-20")
             @RequestParam(required = false) String returnDate,
-            @Parameter(description = "Return time in HH:mm format (optional)", example = "18:00")
-            @RequestParam(required = false) String returnTime,
             @Parameter(description = "Results limit", example = "20")
             @RequestParam(defaultValue = "20") int limit,
             @Parameter(description = "Pagination cursor (optional)")
@@ -61,11 +57,9 @@ public class FlightController {
                 origin,
                 destination,
                 departureDate,
-                departureTime,
                 numberOfAdults,
                 numberOfChildren,
                 returnDate,
-                returnTime,
                 limit,
                 after
         ));

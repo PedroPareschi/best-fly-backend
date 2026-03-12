@@ -31,10 +31,10 @@ class FlightServiceTest {
 
     @Test
     void searchFlightsShouldReturnEmptyWhenOfferRequestIdIsMissing() {
-        when(duffelService.createOfferRequest("GRU", "JFK", "2026-01-01", null, 1, 0, null, null))
+        when(duffelService.createOfferRequest("GRU", "JFK", "2026-01-01", 1, 0, null))
                 .thenReturn(new DuffelOfferRequestResponse(null));
 
-        FlightSearchResponse response = flightService.searchFlights("GRU", "JFK", "2026-01-01", null, 1, 0, null, null, 20, null);
+        FlightSearchResponse response = flightService.searchFlights("GRU", "JFK", "2026-01-01", 1, 0, null, 20, null);
 
         assertEquals(0, response.offers().size());
         assertEquals(20, response.pagination().limit());
@@ -45,7 +45,7 @@ class FlightServiceTest {
 
     @Test
     void searchFlightsShouldMapOffersAndPagination() {
-        when(duffelService.createOfferRequest("GRU", "JFK", "2026-01-01", null, 1, 0, null, null))
+        when(duffelService.createOfferRequest("GRU", "JFK", "2026-01-01", 1, 0, null))
                 .thenReturn(new DuffelOfferRequestResponse(new DuffelOfferRequestResponse.Data("offer-req-1")));
 
         DuffelOfferListResponse.Place gru = new DuffelOfferListResponse.Place("GRU", "Guarulhos", "Sao Paulo");
@@ -70,7 +70,7 @@ class FlightServiceTest {
 
         when(duffelService.listOffers("offer-req-1", 20, null)).thenReturn(offerListResponse);
 
-        FlightSearchResponse response = flightService.searchFlights("GRU", "JFK", "2026-01-01", null, 1, 0, null, null, 20, null);
+        FlightSearchResponse response = flightService.searchFlights("GRU", "JFK", "2026-01-01", 1, 0, null, 20, null);
 
         assertEquals(1, response.offers().size());
         assertEquals("123.45", response.offers().getFirst().price().amount());

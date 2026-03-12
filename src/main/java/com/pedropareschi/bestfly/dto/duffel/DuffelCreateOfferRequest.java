@@ -20,14 +20,7 @@ public record DuffelCreateOfferRequest(
     public record Slice(
             String origin,
             String destination,
-            String departure_date,
-            DepartureTime departure_time
-    ) {
-    }
-
-    public record DepartureTime(
-            String from,
-            String to
+            String departure_date
     ) {
     }
 
